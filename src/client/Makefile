@@ -17,9 +17,6 @@ BUILD_DIR = build
 TARGET_EXE_NAME = client.exe
 TARGET = $(OUTPUT_DIR)/$(TARGET_EXE_NAME)
 
-SERVER_TARGET_NAME = server.exe
-SERVER_TARGET = $(OUTPUT_DIR)/$(SERVER_TARGET_NAME)
-
 # --- Source Files ---
 # Core engine C++ files
 CORE_CPP_FILES = $(wildcard Core/*.cpp)

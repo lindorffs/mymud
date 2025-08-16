@@ -27,6 +27,7 @@
 #include <imgui_impl_sdlrenderer3.h>
 
 static  int g_windowHeight, g_windowWidth;
+static float g_displayScale;
 
 namespace RTSEngine {
     namespace Core {
@@ -250,11 +251,13 @@ namespace RTSEngine {
                 }
 				
 				
-				float main_scale = SDL_GetDisplayContentScale(SDL_GetPrimaryDisplay());
+				g_displayScale = SDL_GetDisplayContentScale(SDL_GetPrimaryDisplay());
 
                 window_ = SDL_CreateWindow("Untitled Project",
-                                         (int)(WINDOW_DEFAULT_WIDTH*main_scale), (int)(WINDOW_DEFAULT_HEIGHT*main_scale),
+                                         (int)(WINDOW_DEFAULT_WIDTH), (int)(WINDOW_DEFAULT_HEIGHT),
                                          SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIGH_PIXEL_DENSITY);
+				g_windowWidth = WINDOW_DEFAULT_WIDTH;
+				g_windowHeight = WINDOW_DEFAULT_HEIGHT;
                 if (!window_) {
                     std::cerr << "Window creation failed: " << SDL_GetError() << std::endl;
                     TTF_Quit(); SDL_Quit();
@@ -284,8 +287,8 @@ namespace RTSEngine {
 				
 				ImGui::StyleColorsDark();
 				ImGuiStyle& style = ImGui::GetStyle();
-				style.ScaleAllSizes(main_scale);        // Bake a fixed style scale. (until we have a solution for dynamic style scaling, changing this requires resetting Style + calling this again)
-				style.FontScaleDpi = main_scale;  
+				style.ScaleAllSizes(g_displayScale);        // Bake a fixed style scale. (until we have a solution for dynamic style scaling, changing this requires resetting Style + calling this again)
+				style.FontScaleDpi = g_displayScale;  
 				style.FontSizeBase = 16.0f;
 				ImGui_ImplSDL3_InitForSDLRenderer(window_, renderer_);
 				ImGui_ImplSDLRenderer3_Init(renderer_);
@@ -572,7 +575,9 @@ namespace RTSEngine {
             }
         }
 
-        bool Game::loadAssets() {	
+        bool Game::loadAssets() {
+			
+            if (!assetManager_.loadTexture("wallpaper", "./assets/wallpapers/main.png")) {};
 			if (!audioManager_.loadSoundEffect("keypress", "./assets/sounds/keypress.wav")) {
 				std::cerr << "Game Warning: Failed to load keypress sound." << std::endl;
 			}
@@ -834,8 +839,13 @@ namespace RTSEngine {
 			SDL_SetRenderDrawColor(renderer_, 0, 0, 0, 255);
 			SDL_RenderClear(renderer_);
 			
-			
-			
+			SDL_Texture* bg_tex = assetManager_.getTexture("wallpaper");
+			SDL_FRect texRect = {
+				0.0f, 0.0f,
+				(float)g_windowWidth, (float)g_windowHeight
+			};
+			SDL_RenderTexture(renderer_, bg_tex, nullptr, &texRect);
+
 			ImGui_ImplSDLRenderer3_NewFrame();
 			ImGui_ImplSDL3_NewFrame();
 			ImGui::NewFrame();
@@ -885,6 +895,8 @@ namespace RTSEngine {
         void Game::handleResize() {
             if (window_ && renderer_) {
                 SDL_GetWindowSizeInPixels(window_, &g_windowWidth, &g_windowHeight);
+				g_windowWidth = g_windowWidth;
+				g_windowHeight = g_windowHeight;
 				std::cout << "Handle Resize finished." << std::endl;
             }
         }

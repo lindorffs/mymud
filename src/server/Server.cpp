@@ -876,19 +876,6 @@ namespace RTSEngine {
 				} else {
 					fprintf(stdout, "Characters Table created successfully\n");
 				}
-				
-				char *sql_insert = "INSERT INTO USERS (USERNAME,PASSWORD_HASH) " \
-				   "VALUES ('admin', '098f6bcd4621d373cade4e832627b4f6');" \
-				   "INSERT INTO CHARACTERS (USER_ID,NAME,NEW,SYSTEM,PROXIMITY,XP_COMBAT,XP_EXPLORE)" \
-				   "VALUES (1, 'Evie', False, 'The_Voids_Maw', 'None', 0, 0);";
-				   
-				
-				if (sqlite3_exec(database_, sql_insert, callback, 0, &zErrMsg) != SQLITE_OK) {
-					fprintf(stderr, "SQL error: %s\n", zErrMsg);
-					sqlite3_free(zErrMsg);
-				} else {
-					fprintf(stdout, "Admin user/character created.\n");
-				}
 			}
 
 			isRunning_ = true;
