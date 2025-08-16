@@ -563,7 +563,7 @@ namespace RTSEngine {
 										   "VALUES (?, ?, True, 'Cygnus_Prime', 'None', 0, 0);";
 										sqlite3_prepare_v2(database_, sql_insert_new_char, -1, &new_char_stmt, NULL);
 										sqlite3_bind_int(new_char_stmt, 1, new_user_id);
-										sqlite3_bind_text(new_char_stmt, 2, "Cascadian Citizen", -1, SQLITE_TRANSIENT);
+										sqlite3_bind_text(new_char_stmt, 2, username.c_str(), -1, SQLITE_TRANSIENT);
 										rc = sqlite3_step(new_char_stmt);
 										if (rc != SQLITE_DONE && rc != SQLITE_ROW) {
 											std::cout << "Failed to create new character for: " << username.c_str() << std::endl;
