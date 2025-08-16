@@ -849,9 +849,10 @@ namespace RTSEngine {
 				
 				char *zErrMsg = 0;
 				char *sql_users_create = "CREATE TABLE IF NOT EXISTS USERS(" \
-				   "ID INTEGER PRIMARY KEY     AUTOINCREMENT," \
-				   "USERNAME           TEXT    NOT NULL," \
-				   "PASSWORD_HASH           TEXT     NOT NULL);";
+				   "ID INTEGER PRIMARY 		KEY     AUTOINCREMENT," \
+				   "USERNAME           		TEXT    NOT NULL," \
+				   "PASSWORD_HASH           TEXT    NOT NULL,"\
+				   "ADMIN					BOOL);";
 				
 				if (sqlite3_exec(database_, sql_users_create, callback, 0, &zErrMsg) != SQLITE_OK) {
 					fprintf(stderr, "SQL error: %s\n", zErrMsg);
