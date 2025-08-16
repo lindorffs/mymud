@@ -1,0 +1,6 @@
+lib/
+vendor/
+src/client/bin
+src/client/obj
+src/server/bin
+src/server/obj
