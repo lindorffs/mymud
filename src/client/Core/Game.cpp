@@ -549,6 +549,22 @@ namespace RTSEngine {
                             handleDisconnection(client_kicked_msg.message);
                         }
                         break;
+						
+						case Network::NetworkMsgType::S2C_PLAYER_INFO:
+                        {
+                            Network::PlayerNetInfo player_info_msg;
+                            ia >> player_info_msg; // Deserialize into the struct
+
+							if (player_info_msg.you) {
+								myPlayer.name = player_info_msg.name;
+								myPlayer.system = player_info_msg.system;
+								myPlayer.proximity = player_info_msg.proximity;
+								myPlayer.combat_xp = player_info_msg.combat_xp;
+								myPlayer.explore_xp = player_info_msg.explore_xp;
+							}
+                        }
+						break;
+						
                         default:
                             std::cerr << "Client: Received unhandled Boost.Archive message type ID: "
                                       << static_cast<int>(msg_type_id) << std::endl;

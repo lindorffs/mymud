@@ -94,6 +94,15 @@ namespace RTSEngine {
 			std::vector<ProceduralObject> m_galaxies;
 			std::vector<ProceduralObject> m_dustClouds;
 		};
+		
+		struct PlayerInfo {
+			std::string name;
+			std::string system;
+			std::string proximity;
+			unsigned int combat_xp;
+			unsigned int explore_xp;
+		};
+		
         // Game class remains the central piece
         class Game {
         private:
@@ -104,6 +113,7 @@ namespace RTSEngine {
             std::string connection_status_message_ = "Connecting...";
 			std::map<int, LobbyPlayerInfo> client_lobby_players_; // Keyed by player ID
 			int myPlayerId_ = -1; // Assigned by server
+			
 			bool isInLobby_ = false; // True when connected and before game starts
 			int lobbyMaxPlayers_ = 0; // Received from server
 
@@ -114,6 +124,7 @@ namespace RTSEngine {
             unsigned int currentTicks_;
 			
 			std::string currentScene_ = "s4000g2d5R0G5B15";
+
 
             std::string targetServerIp_;
             unsigned short serverPort_;
@@ -175,6 +186,7 @@ namespace RTSEngine {
 			std::string password_;
 			asio::ssl::context ssl_context_;
         public:
+			PlayerInfo myPlayer;
 			ImFont *font_title;
 			ImFont *font_subtitle;
 			ImFont *font_description;

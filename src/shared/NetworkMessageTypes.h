@@ -11,13 +11,13 @@ namespace RTSEngine {
             // Server to Client
             S2C_ASSIGN_PLAYER_ID = 1,
             S2C_LOBBY_WELCOME = 2,
-            S2C_LOBBY_MESSAGE_TEXT = 8,
-            S2C_COMMAND_ACK = 12,
-            S2C_ERROR_MESSAGE_TEXT = 13,
-			S2C_CHAT_BROADCAST = 14,
-			S2C_CLIENT_KICKED = 15,
-			S2C_LOGIN_RESPONSE = 16,
-			S2C_PLAYER_DATA = 17,
+            S2C_LOBBY_MESSAGE_TEXT = 3,
+            S2C_COMMAND_ACK = 4,
+            S2C_ERROR_MESSAGE_TEXT = 5,
+			S2C_CHAT_BROADCAST = 6,
+			S2C_CLIENT_KICKED = 7,
+			S2C_LOGIN_RESPONSE = 8,
+			S2C_PLAYER_INFO = 9,
             // Client to Server
             C2S_LOGIN_REQUEST = 100, // Example initial join message
             C2S_CLIENT_COMMAND = 101,

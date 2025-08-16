@@ -43,18 +43,23 @@ namespace RTSEngine {
 				ar & max_players;
 			}
 		};
-		struct LobbyPlayerNetInfo {
-            int32_t id = -1;
+		struct PlayerNetInfo {
             std::string name = "Unknown";
-            bool is_ready = false;
-            // Add other displayable info if needed (e.g., chosen_faction_id, color_id)
+			std::string system = "";
+			std::string proximity = "";
+			unsigned int combat_xp = 0;
+			unsigned int explore_xp = 0;
+			bool you;
 
             friend class boost::serialization::access;
             template<class Archive>
             void serialize(Archive & ar, const unsigned int version) {
-                ar & id;
                 ar & name;
-                ar & is_ready;
+                ar & system;
+				ar & proximity;
+				ar & combat_xp;
+				ar & explore_xp;
+				ar & you;
             }
         };
 		// Server to Client: Acknowledgment for a received ClientCommand

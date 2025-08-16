@@ -18,6 +18,7 @@ namespace RTSEngine {
 		static bool render_disconnect_confirm = true;
 		static bool render_system_list = false;
 		static bool render_command_line = false;
+		static bool render_character_info = false;
 		const NineSliceBorders side_panel_borders = {11.0f, 11.0f, 11.0f, 11.0f}; // Example: 16px borders
 		const NineSliceBorders top_bar_borders    = {5.0f, 5.0f, 5.0f, 5.0f};    // Example
 		const NineSliceBorders bottom_panel_borders = {11.0f, 11.0f, 11.0f, 11.0f};
@@ -139,6 +140,51 @@ namespace RTSEngine {
 				ImGui::End();
 			}
 		}
+		void UIManager::renderCharacterInfo(Core::Game *game) {
+			int winW, winH;
+			SDL_GetWindowSizeInPixels(game->get_window(), &winW, &winH);
+			
+			ImGui::SetNextWindowPos(ImVec2(winW-(winW*0.95), winH-(winH*0.95)), ImGuiCond_FirstUseEver);
+			ImGui::SetNextWindowSize(ImVec2(winW*0.9, winH*0.9), ImGuiCond_FirstUseEver);
+			
+			if (!ImGui::Begin("character.db", &render_character_info)) {
+				// --- System Name (using Title Font) ---
+				ImGui::End();
+				return;
+			} else {
+				
+				ImGui::Text("Name: "); ImGui::SameLine();
+				
+				ImGui::PushFont(game->font_title);
+				ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%s", game->myPlayer.name.c_str());
+				
+				ImGui::PopFont();
+				
+				ImGui::Spacing();
+				
+				ImGui::PushFont(game->font_subtitle);
+				ImGui::Text("Location:");
+				ImGui::PopFont();
+				ImGui::Separator();
+
+				// Push the description font for the content inside the box
+				ImGui::PushFont(game->font_description);
+				ImGui::TextWrapped("%s, %s", game->myPlayer.proximity.c_str(), game->myPlayer.system.c_str());
+				ImGui::PopFont();
+				
+				ImGui::PushFont(game->font_subtitle);
+				ImGui::Text("Location:");
+				ImGui::PopFont();
+				ImGui::Separator();
+
+				// Push the description font for the content inside the box
+				ImGui::PushFont(game->font_description);
+				ImGui::TextWrapped("Combat: %d", game->myPlayer.combat_xp);
+				ImGui::TextWrapped("Exploration:  %d", game->myPlayer.explore_xp);
+				ImGui::PopFont();
+				ImGui::End();
+			}
+		}
 
 		// Helper (add to UIManager or a Utils class)
 		void UIManager::renderText(const std::string& text, float x, float y, TTF_Font* font, SDL_Color color) {
@@ -206,8 +252,8 @@ namespace RTSEngine {
 				std::string command_name;
 				std::vector<std::string> args = game->getMutableCommandLine().parseFullCommand(lower_command_name, command_name);
 				
-				if (command_name == "systems.db") {
-					render_system_list = !render_system_list;
+				if (command_name == "character.db") {
+					render_system_list = !render_character_info;
 				} else {
 					std::string output = game->getMutableCommandLine().interpretCommand(command_name, args, lower_command_name, game);
 				}
@@ -331,6 +377,9 @@ namespace RTSEngine {
 				}
 				
 				if (ImGui::BeginMenu("Info")) {
+					if (ImGui::MenuItem("character.db")) {
+						render_character_info = !render_character_info;
+					}
 					if (ImGui::MenuItem("systems.db")) {
 						render_system_list = !render_system_list;
 					}
@@ -389,8 +438,8 @@ namespace RTSEngine {
 			if (render_command_line) {
 				renderCommandLogPanel(game);
 			}
-			if (render_system_list) {
-				renderMap(game);
+			if (render_character_info) {
+				renderCharacterInfo(game);
 			}
 		}
 
@@ -413,6 +462,7 @@ namespace RTSEngine {
 			}
 			
 		}
+		
 		void UIManager::renderDisconnectedScreen(const std::string& message, Core::Game* game) {
 			int winW, winH;
 			SDL_GetWindowSizeInPixels(window_, &winW, &winH);

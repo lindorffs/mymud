@@ -70,6 +70,7 @@ namespace RTSEngine {
 			void renderLobbyScreen(const std::map<int, Core::LobbyPlayerInfo>& players, int myId, int maxPlayers, const CommandLine& cmdLine, Core::Game* game);
 			void renderLoadingScreen(const std::string& message);
 			void renderDisconnectedScreen(const std::string& message, Core::Game* game);
+			void renderCharacterInfo(Core::Game *game);
 			void renderText(const std::string& text, float x, float y, TTF_Font* font, SDL_Color color);
 			void renderMap(Core::Game* game);
             void renderAll(const CommandLine& cmdLine,

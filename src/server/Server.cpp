@@ -322,6 +322,7 @@ namespace RTSEngine {
 			if (target_session) {
 				Network::NetworkMsgType msg_type_id = Network::NetworkMsgType::MSG_UNKNOWN;
 				if (type_str_from_lua == "LOBBY_WELCOME") msg_type_id = Network::NetworkMsgType::S2C_LOBBY_WELCOME;
+				else if (type_str_from_lua == "PLAYER_INFO") msg_type_id = Network::NetworkMsgType::S2C_PLAYER_INFO;
 				else if (type_str_from_lua == "CHAT_BROADCAST") msg_type_id = Network::NetworkMsgType::S2C_CHAT_BROADCAST;
 				else {
 					std::cerr << "Server (sendMessageToPlayer_Lua): Unknown message type string from Lua: " << type_str_from_lua << std::endl;
@@ -332,9 +333,7 @@ namespace RTSEngine {
 				boost::archive::binary_oarchive oa(ss_payload);
 
 				bool serialization_ok = false;
-				if (msg_type_id == Network::NetworkMsgType::S2C_PLAYER_DATA) {
-					
-				} else if (msg_type_id == Network::NetworkMsgType::S2C_LOBBY_WELCOME) {
+				if (msg_type_id == Network::NetworkMsgType::S2C_LOBBY_WELCOME) {
 					Network::LobbyWelcomeMsg welcome_msg_data;
 					
 					if (data_lua_table["message"].is<std::string>() &&
@@ -363,6 +362,25 @@ namespace RTSEngine {
                         oa << msg_data;
                         serialization_ok = true;
                     }
+				} else if (msg_type_id == Network::NetworkMsgType::S2C_PLAYER_INFO) {
+					Network::PlayerNetInfo msg_data;
+					
+					sol::optional<bool> p_you_opt = data_lua_table["you"];
+					sol::optional<std::string> p_name_opt = data_lua_table["name"];
+					sol::optional<std::string> p_system_opt = data_lua_table["system"];
+					sol::optional<std::string> p_proximity_opt = data_lua_table["proximity"];
+					sol::optional<unsigned int> p_combat_xp_opt = data_lua_table["combat_xp"];
+					sol::optional<unsigned int> p_explore_xp_opt = data_lua_table["explore_xp"];
+					
+					msg_data.you = *p_you_opt;
+					msg_data.name = *p_name_opt;
+					msg_data.system = *p_system_opt;
+					msg_data.proximity = *p_proximity_opt;
+					msg_data.combat_xp = *p_combat_xp_opt;
+					msg_data.explore_xp = *p_explore_xp_opt;
+					
+					oa << msg_data;
+					serialization_ok = true;					
 				} else {
 					std::cerr << "Server (sendMessageToPlayer_Lua): No specific Boost serialization implemented for type " << type_str_from_lua << std::endl;
 				}
@@ -560,7 +578,7 @@ namespace RTSEngine {
 										sqlite3_finalize(new_user_id_statement);
 										sqlite3_stmt *new_char_stmt;
 										char *sql_insert_new_char = "INSERT INTO CHARACTERS (USER_ID,NAME,NEW,SYSTEM,PROXIMITY,XP_COMBAT,XP_EXPLORE)" \
-										   "VALUES (?, ?, True, 'Cygnus_Prime', 'None', 0, 0);";
+										   "VALUES (?, ?, True, 'Cygnus_Prime', 'State_Military_Academy', 0, 100);";
 										sqlite3_prepare_v2(database_, sql_insert_new_char, -1, &new_char_stmt, NULL);
 										sqlite3_bind_int(new_char_stmt, 1, new_user_id);
 										sqlite3_bind_text(new_char_stmt, 2, username.c_str(), -1, SQLITE_TRANSIENT);
@@ -589,6 +607,8 @@ namespace RTSEngine {
 									std::string character_name;
 									std::string system_string;
 									std::string proximity_string;
+									unsigned int xp_combat;
+									unsigned int xp_explore;
 									sqlite3_stmt *character_stmt;
 									std::string query = "SELECT ID, NAME, SYSTEM, PROXIMITY, XP_COMBAT, XP_EXPLORE FROM characters WHERE user_id = ? LIMIT 1;";
 									
@@ -607,7 +627,8 @@ namespace RTSEngine {
 											system_string = reinterpret_cast<const char*>(system_from_db);
 											proximity_from_db = sqlite3_column_text(character_stmt, 3);
 											proximity_string = reinterpret_cast<const char*>(proximity_from_db);
-											
+											xp_combat = sqlite3_column_int(character_stmt, 4);
+											xp_explore = sqlite3_column_int(character_stmt, 5);
 											character_id = sqlite3_column_int(character_stmt, 0);
 										}
 										rc = sqlite3_step(character_stmt);
@@ -615,7 +636,7 @@ namespace RTSEngine {
 									sqlite3_finalize(character_stmt);
 									std::cout << "Found character! " << character_name << ", " << system_string << ", " << proximity_string << std::endl;
 									if (lua_on_connect.valid()) {
-										sol::protected_function_result result = lua_on_connect(playerId, user_id, character_id, character_name, system_string, proximity_string);
+										sol::protected_function_result result = lua_on_connect(playerId, user_id, character_id, character_name, system_string, proximity_string, xp_combat, xp_explore);
 										if (!result.valid()) {
 											sol::error err = result;
 											std::cerr << "Server: Lua error in OnPlayerAccepted: " << err.what() << std::endl;
@@ -793,7 +814,7 @@ namespace RTSEngine {
             std::cout << "Server Console: Input thread exiting." << std::endl;
         }
 
-         void Server::serverGameLoop() {
+        void Server::serverGameLoop() {
 			auto now = std::chrono::system_clock::now();
             u_int64 currentTicks_ = std::chrono::duration_cast<std::chrono::milliseconds>(
 				now.time_since_epoch()
