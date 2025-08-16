@@ -242,7 +242,7 @@ namespace RTSEngine {
 			}
 			
 			// Login Window
-			ImGui::SetNextWindowPos(ImVec2(winW/2.0f - 260, winH/2-140), ImGuiCond_Always);
+			ImGui::SetNextWindowPos(ImVec2(winW/2.0f - 260, winH/2-90), ImGuiCond_Always);
 			ImGui::SetNextWindowSize(ImVec2(500, 180));
 			
 			// As before, always call ImGui::End() after a Begin()
@@ -340,8 +340,8 @@ namespace RTSEngine {
 			}
 			
 			if (render_logout_confirm) {
-				ImGui::SetNextWindowPos(ImVec2(winW/2.0f - 260, winH/2-140), ImGuiCond_Always);
-				ImGui::SetNextWindowSize(ImVec2(500, 180), ImGuiCond_Always);
+				ImGui::SetNextWindowPos(ImVec2(winW/2.0f - 260, winH/2-90), ImGuiCond_Always);
+				ImGui::SetNextWindowSize(ImVec2(500, 180));
 				ImGui::OpenPopup("Logout?");
 				if (ImGui::BeginPopupModal("Logout?", &render_logout_confirm, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize)) {
 					ImGui::Text("You can always come back later.");
@@ -364,8 +364,8 @@ namespace RTSEngine {
 				}
 			}
 			if (render_quit_confirm) {
-				ImGui::SetNextWindowPos(ImVec2(winW/2.0f - 260, winH/2-140), ImGuiCond_Always);
-				ImGui::SetNextWindowSize(ImVec2(500, 180), ImGuiCond_Always);
+				ImGui::SetNextWindowPos(ImVec2(winW/2.0f - 260, winH/2-90), ImGuiCond_Always);
+				ImGui::SetNextWindowSize(ImVec2(500, 180));
 				ImGui::OpenPopup("Exit to Desktop?");
 				if (ImGui::BeginPopupModal("Exit to Desktop?", &render_quit_confirm, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize)) {
 					ImGui::Text("You can always come back later.");
@@ -416,9 +416,9 @@ namespace RTSEngine {
 		void UIManager::renderDisconnectedScreen(const std::string& message, Core::Game* game) {
 			int winW, winH;
 			SDL_GetWindowSizeInPixels(window_, &winW, &winH);
-			
-			ImGui::SetNextWindowPos(ImVec2(winW/2.0f - 200, winH - 200), ImGuiCond_Always);
-			ImGui::SetNextWindowSize(ImVec2(400, 120));
+						
+			ImGui::SetNextWindowPos(ImVec2(winW/2.0f - 260, winH/2-90), ImGuiCond_Always);
+			ImGui::SetNextWindowSize(ImVec2(500, 180));
 			
 			// As before, always call ImGui::End() after a Begin()
 			if (ImGui::Begin("Disconnected", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse)) {
