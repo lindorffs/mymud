@@ -173,7 +173,7 @@ namespace RTSEngine {
 				ImGui::PopFont();
 				
 				ImGui::PushFont(game->font_subtitle);
-				ImGui::Text("Location:");
+				ImGui::Text("Experience:");
 				ImGui::PopFont();
 				ImGui::Separator();
 

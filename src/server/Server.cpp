@@ -826,20 +826,14 @@ namespace RTSEngine {
 				server_process_incoming_messages();
 
 				if (lua_initialized_) {
-					float deltaTime = (currentTicks_ - lastLogicTick_) / 1000.0f;
-					if (deltaTime == 0 && (currentTicks_ != lastLogicTick_)) deltaTime = (float)SERVER_TICK_RATE_MS / 1000.0f; // Ensure some delta if ticks are too close
-
-					if (currentTicks_ - lastLogicTick_ >= SERVER_TICK_RATE_MS) {
-						try {
-							sol::protected_function lua_update_lobby = lua_state_["UpdateLobbyTick"];
-							if (lua_update_lobby.valid()) {
-								sol::protected_function_result result = lua_update_lobby(deltaTime);
-								if (!result.valid()) { /* log error */ }
-							}
-						} catch (const sol::error& e) { /* log error */ }
-                        lastLogicTick_ = currentTicks_;
-                    }
-                }
+					try {
+						sol::protected_function lua_update_lobby = lua_state_["UpdateLobbyTick"];
+						if (lua_update_lobby.valid()) {
+							sol::protected_function_result result = lua_update_lobby(1);
+							if (!result.valid()) { /* log error */ }
+						}
+					} catch (const sol::error& e) { /* log error */ }
+				}
                 std::this_thread::sleep_for(std::chrono::milliseconds(50));
             }
 			std::cout << "Server game loop ended. Signaling console input thread to exit if still running." << std::endl;
