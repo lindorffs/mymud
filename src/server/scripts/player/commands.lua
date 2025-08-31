@@ -23,7 +23,7 @@ function OnPlayerWhereCommand(playerId, argsTable)
 	local system = Systems[player.currentSystem]
 	local site = system.Sites[player.proximity]
 	
-	GameAPI.sendPlayerCommandAck(playerId, "Server", true, "In proximity of: " .. site.description .. ", " .. system.description)
+	GameAPI.sendPlayerCommandAck(playerId, "Server", true, "In proximity of: " .. site.siteName .. ", " .. system.systemName)
 end
 
 function OnPlayerJumpCommand(playerId, argsTable)
