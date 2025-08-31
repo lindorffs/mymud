@@ -16,6 +16,7 @@ function OnPlayerAccepted(playerId, userId, characterId, name, system, proximity
 		combat_xp = newPlayer.xp.combat,
 		explore_xp = newPlayer.xp.explore
 	})
+	GameAPI.sendMessageToPlayer(playerId, "MAP_DATA", {systems=Systems})
 end
 
 function OnPlayerDisconnected(playerId)
