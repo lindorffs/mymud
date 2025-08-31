@@ -324,6 +324,7 @@ namespace RTSEngine {
 				if (type_str_from_lua == "LOBBY_WELCOME") msg_type_id = Network::NetworkMsgType::S2C_LOBBY_WELCOME;
 				else if (type_str_from_lua == "PLAYER_INFO") msg_type_id = Network::NetworkMsgType::S2C_PLAYER_INFO;
 				else if (type_str_from_lua == "CHAT_BROADCAST") msg_type_id = Network::NetworkMsgType::S2C_CHAT_BROADCAST;
+				else if (type_str_from_lua == "MAP_DATA") msg_type_id = Network::NetworkMsgType::S2C_MAP_DATA;
 				else {
 					std::cerr << "Server (sendMessageToPlayer_Lua): Unknown message type string from Lua: " << type_str_from_lua << std::endl;
 					return;
@@ -380,7 +381,72 @@ namespace RTSEngine {
 					msg_data.explore_xp = *p_explore_xp_opt;
 					
 					oa << msg_data;
-					serialization_ok = true;					
+					serialization_ok = true;
+				} else if (msg_type_id == Network::NetworkMsgType::S2C_MAP_DATA) {
+					Network::MapDataPayload msg_data;
+
+					sol::optional<sol::table> systems_table_opt = data_lua_table["systems"];
+
+					if (systems_table_opt) {
+						sol::table systems_table = *systems_table_opt;
+
+						// 2. Iterate over the key-value pairs in the 'Systems' table.
+						//    (e.g., key="Sol", value={ description="...", connections={...} })
+						for (const auto& kvp : systems_table) {
+							// Ensure the key is a string and the value is a table (the system object).
+							if (kvp.first.is<std::string>() && kvp.second.is<sol::table>()) {
+								
+								Core::SystemInformation current_system;
+								current_system.systemName = kvp.first.as<std::string>();
+
+								// 3. Get the inner table which holds the description and connections.
+								sol::table system_object_table = kvp.second.as<sol::table>();
+
+								// 4. Safely parse the 'description' string from the inner table.
+								sol::optional<std::string> desc_opt = system_object_table["description"];
+								if (desc_opt) {
+									current_system.description = *desc_opt;
+								}
+
+								sol::optional<sol::table> sites_table_opt = system_object_table["sites"];
+								if (sites_table_opt) {
+									sol::table sites_table = *sites_table_opt;
+
+									// Iterate through the array of site objects
+									for (const auto& site_kvp : sites_table) {
+										std::cerr << "Got site!" << std::endl;
+										// The value is now a table representing a site object, not a string.
+										if (site_kvp.second.is<sol::table>()) {
+											sol::table site_object = site_kvp.second.as<sol::table>();
+
+											// Create a new C++ Site object to populate
+											Core::SiteInformation new_site;
+
+											// Safely get the description string
+											new_site.siteName = site_object["siteName"].get_or<std::string>("Anomally");
+											new_site.description = site_object["description"].get_or<std::string>("");
+
+											// Add the fully parsed Site object to the system's vector of sites
+											current_system.sites.push_back(new_site);
+										} else {
+											std::cerr << "S2C_MAP_DATA Error: Malformed site data." << std::endl; 	
+										}
+									}
+								}
+
+								// 6. Add the fully populated system object to our payload.
+								msg_data.systems.push_back(current_system);
+
+							} else {
+								std::cerr << "S2C_MAP_DATA Error: Malformed entry in 'systems' table. Key must be string, value must be table." << std::endl;
+							}
+						}
+
+						// 7. If we've successfully processed the table, serialize the data.
+						oa << msg_data;
+						serialization_ok = true;
+
+					}
 				} else {
 					std::cerr << "Server (sendMessageToPlayer_Lua): No specific Boost serialization implemented for type " << type_str_from_lua << std::endl;
 				}

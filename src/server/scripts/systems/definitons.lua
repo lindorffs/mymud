@@ -4,14 +4,16 @@ Systems = {
 		players = {},
 		Sites = {
 			State_Military_Academy = {
-				description = "State Military Acadaemy",
+				siteName = "State Military Academy",
+				description = "",
 				rewards = {
 					combat = 1
 				},
 				connections = {},
 			},
 			Jumpgate_Delta_Pyre = {
-				description = "Jumpgate - Delta Pyre",
+				siteName = "Jumpgate - Delta Pyre",
+				description = "",
 				rewards = {},
 				connections = { {target_system="Delta_Pyre", target_proximity="Jumpgate_Cygnus_Prime", distance = 12} },
 			}
@@ -22,14 +24,16 @@ Systems = {
 		players = {},
 		Sites = {
 			State_Science_Academy = {
-				description = "State Science Academy",
+				siteName = "State Science Academy",
+				description = "",
 				rewards = {
 					explore = 1
 				},
 				connections = {},
 			},
 			Jumpgate_Cygnus_Prime = {
-				description = "Jumpgate - Cygnus Prime",
+				siteName = "Jumpgate - Cygnus Prime",
+				description = "",
 				rewards = {},
 				connections = { {target_system="Cygnus_Prime", target_proximity="Jumpgate_Delta_Pyre", distance = 12} },
 			},

@@ -43,6 +43,16 @@ namespace RTSEngine {
 				ar & max_players;
 			}
 		};
+		
+		struct MapDataPayload {
+            std::vector<Core::SystemInformation> systems;
+
+            friend class boost::serialization::access;
+            template<class Archive>
+            void serialize(Archive & ar, const unsigned int version) {
+                ar & systems;
+            }
+        };
 		struct PlayerNetInfo {
             std::string name = "Unknown";
 			std::string system = "";

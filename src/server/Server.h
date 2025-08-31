@@ -29,7 +29,16 @@ using asio::ip::tcp;         // Alias for TCP types
 namespace RTSEngine {
     namespace Core {
 		class AsioSession;
-		
+		struct Site {
+			std::string name;
+			std::string description;
+		};
+
+		struct System {
+			std::string name;
+			std::string description;
+			std::vector<Site> connected_sites;
+		};
         class Server {
         const int SERVER_TICK_RATE_MS = 75;
         private:
