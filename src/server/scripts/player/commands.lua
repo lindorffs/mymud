@@ -52,7 +52,7 @@ function OnPlayerJumpCommand(playerId, argsTable)
 						Server.players[_].jumping = true
 						Server.players[_].target_system = system.target_system
 						Server.players[_].target_proximity = system.target_proximity
-						Server.players[_].jump_start_time = os.clock() * 1000
+						Server.players[_].jump_start_time = os.time() * 1000
 						Server.players[_].jump_end_time = Server.players[_].jump_start_time + (system.distance * 500) -- system.distance * 500 = 2 au/s
 					end
 				end
@@ -89,7 +89,7 @@ function OnPlayerWarpCommand(playerId, argsTable)
 					if p.id == playerId then
 						Server.players[_].warping = true
 						Server.players[_].target_proximity = site_id
-						Server.players[_].warp_start_time = os.clock() * 1000
+						Server.players[_].warp_start_time = os.time() * 1000
 						Server.players[_].warp_end_time = Server.players[_].warp_start_time + (2000) -- system.distance * 500 = 2 au/s
 					end
 				end
