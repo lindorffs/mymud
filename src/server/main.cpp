@@ -7,7 +7,7 @@
 #define SERVER
 
 int main(int argc, char* argv[]) {
-    std::string serverIp = "127.0.0.1"; // Default for client, or if server hosts locally
+    std::string serverIp = "0.0.0.0"; // Default for client, or if server hosts locally
     unsigned short serverPort = 12345;    // Default port
 
     for (int i = 1; i < argc; ++i) {
