@@ -2,8 +2,8 @@
 #include "../shared/NetworkMessageTypes.h"
 #include "../shared/NetworkMessages.h"
 #include <sstream>
-#include <boost/archive/binary_oarchive.hpp>
-#include <boost/archive/binary_iarchive.hpp>
+#include <boost/archive/text_oarchive.hpp>
+#include <boost/archive/text_iarchive.hpp>
 #include <openssl/md5.h>
 #include <iostream>
 #include <algorithm>
@@ -215,7 +215,7 @@ namespace RTSEngine {
 			}
 
 			std::stringstream ss_payload;
-			boost::archive::binary_oarchive oa(ss_payload);
+			boost::archive::text_oarchive oa(ss_payload);
 			bool serialization_ok = false;
 
 			try {
@@ -291,7 +291,7 @@ namespace RTSEngine {
 			bool serialization_ok = false;
 
 			try {
-				boost::archive::binary_oarchive oa(ss_payload);
+				boost::archive::text_oarchive oa(ss_payload);
 				oa << ack_data;
 				serialization_ok = true;
 			} catch (const boost::archive::archive_exception& e) {
@@ -330,7 +330,7 @@ namespace RTSEngine {
 				}
 
 				std::stringstream ss_payload;
-				boost::archive::binary_oarchive oa(ss_payload);
+				boost::archive::text_oarchive oa(ss_payload);
 
 				bool serialization_ok = false;
 				if (msg_type_id == Network::NetworkMsgType::S2C_LOBBY_WELCOME) {
@@ -508,7 +508,7 @@ namespace RTSEngine {
                 std::stringstream ss_in(serialized_payload_data);
                 
                 try {
-                    boost::archive::binary_iarchive ia(ss_in);
+                    boost::archive::text_iarchive ia(ss_in);
 
                     switch (msg_type_id) {
 						case Network::NetworkMsgType::C2S_LOGIN_REQUEST: {
@@ -753,7 +753,7 @@ namespace RTSEngine {
 				
 				try {
 					ss_payload_stream.write(reinterpret_cast<const char*>(&msg_type_id), sizeof(msg_type_id));
-					boost::archive::binary_oarchive oa(ss_payload_stream);
+					boost::archive::text_oarchive oa(ss_payload_stream);
 					oa << kick_msg_data;
 				} catch (const boost::archive::archive_exception& e) {
 					std::cerr << "Server Error (kickPlayer_Lua): Failed to serialize kick message for P" << playerId << ". Error: " << e.what() << std::endl;

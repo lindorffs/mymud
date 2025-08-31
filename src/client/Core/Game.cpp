@@ -4,8 +4,8 @@
 #include "../../shared/NetworkMessageTypes.h" // Our enum
 #include "../../shared/NetworkMessages.h"   // Our message structs
 #include <sstream>                       // For std::stringstream
-#include <boost/archive/binary_oarchive.hpp> // For sending
-#include <boost/archive/binary_iarchive.hpp> // For receiving
+#include <boost/archive/text_oarchive.hpp> // For sending
+#include <boost/archive/text_iarchive.hpp> // For receiving
 #include <openssl/md5.h>
 #include <SDL3/SDL_image.h> // If used by client
 #include <SDL3/SDL_ttf.h>   // If used by client
@@ -331,7 +331,7 @@ namespace RTSEngine {
 				ss.write(reinterpret_cast<const char*>(&msg_type_id), sizeof(msg_type_id));
 
 				try {
-					boost::archive::binary_oarchive oa(ss);
+					boost::archive::text_oarchive oa(ss);
 					oa << login_request;
 				} catch (const boost::archive::archive_exception& e) {
 					std::cerr << "Client Error: Failed to serialize ClientLoginRequest: " << e.what() << std::endl;
@@ -442,7 +442,7 @@ namespace RTSEngine {
                 std::stringstream ss_in(serialized_payload_data); // Create input stream from payload
                 
                 try {
-                    boost::archive::binary_iarchive ia(ss_in);
+                    boost::archive::text_iarchive ia(ss_in);
 
                     switch (msg_type_id) {
                         case Network::NetworkMsgType::S2C_ASSIGN_PLAYER_ID:
@@ -947,7 +947,7 @@ namespace RTSEngine {
             ss.write(reinterpret_cast<const char*>(&msg_type_id), sizeof(msg_type_id));
 
             try {
-                boost::archive::binary_oarchive oa(ss);
+                boost::archive::text_oarchive oa(ss);
                 oa << cmd_to_send;
             } catch (const boost::archive::archive_exception& e) {
                 std::cerr << "Client Error: Failed to serialize ClientCommandMsg: " << e.what() << std::endl;
