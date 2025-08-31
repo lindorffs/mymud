@@ -816,7 +816,7 @@ namespace RTSEngine {
 
         void Server::serverGameLoop() {
 			auto now = std::chrono::system_clock::now();
-            u_int64 currentTicks_ = std::chrono::duration_cast<std::chrono::milliseconds>(
+            u_int64_t currentTicks_ = std::chrono::duration_cast<std::chrono::milliseconds>(
 				now.time_since_epoch()
 			).count();
             std::cout << "Server game loop started." << std::endl;

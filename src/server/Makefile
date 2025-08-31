@@ -5,7 +5,7 @@ CXX = x86_64-w64-mingw32-g++
 # CC_C = x86_64-w64-mingw32-gcc
 
 # Compile flags
-CXXFLAGS = -Wa,-mbig-obj -Wextra -std=c++17 -g # Added -g for debug symbols
+CXXFLAGS = -Wextra -std=c++17 -g # Added -g for debug symbols
 # CFLAGS_C = -Wall -std=c11 -g # Example if using a separate C compiler or flags
 
 # --- Directories ---
@@ -47,12 +47,13 @@ STATIC_RUNTIME_FLAGS = -static-libgcc -static-libstdc++
 
 # Libraries to link
 # Verify these library names for your Boost installation (e.g., -lboost_system-mt or -lboost_system)
-BOOST_LIBS = -lboost_system-mgw15-mt-s-x64-1_88 -lboost_thread-mgw15-mt-s-x64-1_88 -lboost_serialization-mgw15-mt-s-x64-1_88 -lssl -lcrypto -lcrypt32
-PTHREAD_LIB = -Wl,--whole-archive -lwinpthread -Wl,--no-whole-archive # For static linking of pthreads if available
-
-WINDOWS_NET_LIBS = -lws2_32 -lwsock32
-LUA_LIB = -llua # Or -llua5.4, etc.
-
+#BOOST_LIBS = -lboost_system-mgw15-mt-s-x64-1_88 -lboost_thread-mgw15-mt-s-x64-1_88 -lboost_serialization-mgw15-mt-s-x64-1_88 -lssl -lcrypto -lcrypt32
+BOOST_LIBS = -lboost_system -lboost_thread -lboost_serialization -lssl -lcrypto -lcrypt
+#PTHREAD_LIB = -Wl,--whole-archive -lwinpthread -Wl,--no-whole-archive # For static linking of pthreads if available
+PTHREAD_LIB=
+#WINDOWS_NET_LIBS = -lws2_32 -lwsock32
+LUA_LIB = -llua5.4 # Or -llua5.4, etc.
+L_LUA_LIB = -llua5.4 # Or -llua5.4, etc.
 SERVER_LINK_LIBS = \
 	-Wl,-Bstatic \
 	$(BOOST_LIBS) \
@@ -62,7 +63,7 @@ SERVER_LINK_LIBS = \
 	$(LUA_LIB) \
 	$(WINDOWS_NET_LIBS)
 
-SERVER_LDFLAGS = $(LIB_DIRS) $(SERVER_LINK_LIBS) -Wa,-mbig-obj
+SERVER_LDFLAGS = $(LIB_DIRS) $(SERVER_LINK_LIBS)
 
 BOOST_SYSTEM_DLL_NAME = libboost_system-mgwXY-mt-x64-1_YZ.dll # e.g., libboost_system-mgw12-mt-x64-1_80.dll
 BOOST_THREAD_DLL_NAME = libboost_thread-mgwXY-mt-x64-1_YZ.dll # e.g., libboost_thread-mgw12-mt-x64-1_80.dll

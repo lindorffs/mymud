@@ -43,8 +43,8 @@ namespace RTSEngine {
 			
             bool lua_initialized_ = false;
             bool isRunning_;
-            u_int64 currentTicks_;
-			u_int64 lastLogicTick_ = 0;
+            u_int64_t currentTicks_;
+            u_int64_t lastLogicTick_ = 0;
 
             unsigned short serverPort_;
 
@@ -169,8 +169,6 @@ private:
             std::deque<std::string> write_msgs_; // Queue of messages to send
             int player_id_; // Server assigns this, client might not use it directly this way
 			
-			
-			const size_t ASIO_READ_BUFFER_SIZE = 1024;
         };
     } // namespace Core
 } // namespace RTSEngine
