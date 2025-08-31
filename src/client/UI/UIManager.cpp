@@ -123,22 +123,103 @@ namespace RTSEngine {
 			
 		}
 		
-		
+		int selected_system_idx = 0;
 		void UIManager::renderMap(Core::Game *game) {
 			int winW, winH;
 			SDL_GetWindowSizeInPixels(game->get_window(), &winW, &winH);
 			
-			ImGui::SetNextWindowPos(ImVec2(winW-(winW*0.95), winH-(winH*0.95)), ImGuiCond_FirstUseEver);
-			ImGui::SetNextWindowSize(ImVec2(winW*0.9, winH*0.9), ImGuiCond_FirstUseEver);
-			
+			ImGui::SetNextWindowPos(ImVec2(winW * 0.05f, winH * 0.05f), ImGuiCond_FirstUseEver);
+			ImGui::SetNextWindowSize(ImVec2(winW * 0.9f, winH * 0.9f), ImGuiCond_FirstUseEver);
+
 			if (!ImGui::Begin("systems.db", &render_system_list)) {
-				
 				ImGui::End();
 				return;
-			} else {
-				
-				ImGui::End();
 			}
+
+			// Left pane: List of systems
+			ImGui::BeginChild("SystemList", ImVec2(ImGui::GetContentRegionAvail().x * 0.3f, 0), true);
+			ImGui::Text("Systems");
+			ImGui::Separator();
+
+			for (int i = 0; i < game->systems.size(); ++i) {
+				if (ImGui::Selectable(game->systems[i].systemName.c_str(), selected_system_idx == i)) {
+					selected_system_idx = i;
+				}
+			}
+			ImGui::EndChild();
+
+			ImGui::SameLine();
+
+			// Right pane: System information
+			ImGui::BeginGroup();
+			if (selected_system_idx >= 0 && selected_system_idx < game->systems.size()) {
+				const Core::SystemInformation& currentSystem = game->systems[selected_system_idx];
+
+				// --- System Name (using Title Font) ---
+				ImGui::Text("System: ");
+				ImGui::SameLine();
+				if (game && game->font_title) {
+					ImGui::PushFont(game->font_title);
+				}
+				ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%s", currentSystem.systemName.c_str());
+				if (game && game->font_title) {
+					ImGui::PopFont();
+				}
+
+				ImGui::Spacing();
+
+				// --- Description ---
+				if (game && game->font_subtitle) {
+					ImGui::PushFont(game->font_subtitle);
+				}
+				ImGui::Text("Description:");
+				if (game && game->font_subtitle) {
+					ImGui::PopFont();
+				}
+				ImGui::Separator();
+
+				if (game && game->font_description) {
+					ImGui::PushFont(game->font_description);
+				}
+				ImGui::TextWrapped("%s", currentSystem.description.c_str());
+				if (game && game->font_description) {
+					ImGui::PopFont();
+				}
+
+				ImGui::Spacing();
+
+				// --- Connected Sites ---
+				if (game && game->font_subtitle) {
+					ImGui::PushFont(game->font_subtitle);
+				}
+				ImGui::Text("Connected Sites:");
+				if (game && game->font_subtitle) {
+					ImGui::PopFont();
+				}
+				ImGui::Separator();
+
+				if (game && game->font_description) {
+					ImGui::PushFont(game->font_description);
+				}
+				if (currentSystem.sites.empty()) {
+					ImGui::TextWrapped("No known connected sites.");
+				} else {
+					for (const auto& site : currentSystem.sites) {
+						ImGui::BulletText("%s", site.siteName.c_str());
+						ImGui::SameLine();
+						ImGui::TextDisabled("(%s)", site.description.c_str());
+					}
+				}
+				if (game && game->font_description) {
+					ImGui::PopFont();
+				}
+
+			} else {
+				ImGui::Text("Select a system from the list.");
+			}
+			ImGui::EndGroup();
+
+			ImGui::End();
 		}
 		void UIManager::renderCharacterInfo(Core::Game *game) {
 			int winW, winH;
@@ -179,8 +260,12 @@ namespace RTSEngine {
 
 				// Push the description font for the content inside the box
 				ImGui::PushFont(game->font_description);
-				ImGui::TextWrapped("Combat: %d", game->myPlayer.combat_xp);
-				ImGui::TextWrapped("Exploration:  %d", game->myPlayer.explore_xp);
+				ImGui::BulletText("Combat:");
+				ImGui::SameLine();
+				ImGui::Text("(%d)", game->myPlayer.combat_xp);
+				ImGui::BulletText("Exploration:");
+				ImGui::SameLine();
+				ImGui::Text("(%d)", game->myPlayer.explore_xp);
 				ImGui::PopFont();
 				ImGui::End();
 			}
@@ -440,6 +525,9 @@ namespace RTSEngine {
 			}
 			if (render_character_info) {
 				renderCharacterInfo(game);
+			}
+			if (render_system_list) {
+				renderMap(game);
 			}
 		}
 

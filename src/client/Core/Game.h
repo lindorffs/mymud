@@ -32,7 +32,8 @@ using asio::ip::tcp;
 namespace RTSEngine {
 	namespace UI { class UIManager; class CommandLine; class SelectionManager; }
     namespace Core {
-
+		
+		
 
         const int MAX_PLAYERS = 2;
         const int SERVER_TICK_RATE_MS = 75;
@@ -186,6 +187,7 @@ namespace RTSEngine {
 			std::string password_;
 			asio::ssl::context ssl_context_;
         public:
+			std::vector<SystemInformation> systems;
 			PlayerInfo myPlayer;
 			ImFont *font_title;
 			ImFont *font_subtitle;

@@ -408,7 +408,7 @@ namespace RTSEngine {
 									current_system.description = *desc_opt;
 								}
 
-								sol::optional<sol::table> sites_table_opt = system_object_table["sites"];
+								sol::optional<sol::table> sites_table_opt = system_object_table["Sites"];
 								if (sites_table_opt) {
 									sol::table sites_table = *sites_table_opt;
 

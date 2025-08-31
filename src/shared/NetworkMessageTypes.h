@@ -18,6 +18,7 @@ namespace RTSEngine {
 			S2C_CLIENT_KICKED = 7,
 			S2C_LOGIN_RESPONSE = 8,
 			S2C_PLAYER_INFO = 9,
+			S2C_MAP_DATA = 10,
             // Client to Server
             C2S_LOGIN_REQUEST = 100, // Example initial join message
             C2S_CLIENT_COMMAND = 101,

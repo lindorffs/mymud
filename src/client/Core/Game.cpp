@@ -564,6 +564,15 @@ namespace RTSEngine {
 							}
                         }
 						break;
+						case Network::NetworkMsgType::S2C_MAP_DATA:
+						{
+							Network::MapDataPayload received_payload;
+							ia >> received_payload;
+							std::cout << "Client: Received map data with " << received_payload.systems.size() << " systems." << std::endl;
+							
+							this->systems = std::move(received_payload.systems);
+						}
+						break;
 						
                         default:
                             std::cerr << "Client: Received unhandled Boost.Archive message type ID: "
@@ -771,7 +780,7 @@ namespace RTSEngine {
         int Game::run() {
 			if (!initSDL(true)) return 1;
 			if (!loadAssets()) { cleanup(); return 1; }
-					
+			
 			isRunning_ = true;
 			
 			clientMasterLoop();
