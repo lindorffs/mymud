@@ -22,7 +22,7 @@ function OnPlayerWhereCommand(playerId, argsTable)
 	local system = Systems[player.currentSystem]
 	local site = system.Sites[player.proximity]
 	
-	local where_string = "("..tostring(player.locaction.x)..","..tostring(player.location.y)..") @ "..
+	local where_string = "("..tostring(player.on_grid_location.x)..","..tostring(player.on_grid_location.y)..") @ "..
 		site.siteName .. "("..tostring(site.location.x)..","..tostring(site.location.y).."), "..
 		system.systemName .. "("..tostring(system.location.x)..","..tostring(system.location.y)..")"
 	
