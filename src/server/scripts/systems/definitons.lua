@@ -44,7 +44,7 @@ Systems = {
 				connections = { {target_system="Cygnus_Prime", target_proximity="Jumpgate_Delta_Pyre", distance = 12} },
 				location = { x = 5, y = 8},
 			},
-		}
+		},
 		location = { x = -6, y = -6 },
 	},
 }
