@@ -372,6 +372,18 @@ namespace RTSEngine {
 					sol::optional<std::string> p_proximity_opt = data_lua_table["proximity"];
 					sol::optional<unsigned int> p_combat_xp_opt = data_lua_table["combat_xp"];
 					sol::optional<unsigned int> p_explore_xp_opt = data_lua_table["explore_xp"];
+					sol::optional<sol::table> p_on_grid_location_opt = data_lua_table["on_grid_location"];
+					
+					if (p_on_grid_location_opt) {
+						sol::table on_grid_location = *p_on_grid_location_opt;
+						int x = on_grid_location["x"];
+						int y = on_grid_location["y"];
+						msg_data.grid_x = x;
+						msg_data.grid_y = y;
+					} else {
+						msg_data.grid_x = 0;
+						msg_data.grid_y = 0;
+					}
 					
 					msg_data.you = *p_you_opt;
 					msg_data.name = *p_name_opt;
@@ -882,9 +894,15 @@ namespace RTSEngine {
 
         void Server::serverGameLoop() {
 			auto now = std::chrono::system_clock::now();
+			#ifdef WIN32
+            uint64_t currentTicks_ = std::chrono::duration_cast<std::chrono::milliseconds>(
+				now.time_since_epoch()
+			).count();
+			#else			
             u_int64_t currentTicks_ = std::chrono::duration_cast<std::chrono::milliseconds>(
 				now.time_since_epoch()
 			).count();
+			#endif
             std::cout << "Server game loop started." << std::endl;
 			std::thread consoleInputThread;
             consoleInputThread = std::thread(consoleInputLoop, this);

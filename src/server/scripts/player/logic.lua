@@ -44,14 +44,14 @@ function PlayerUpdateTick(current_ms)
 				if (current_ms >= p_orig.jump_end_time) then
 					Server.players[_a].jumping = false
 					movePlayer(p_orig.id, p_orig.target_system, p_orig.target_proximity)
-					GameAPI.sendPlayerCommandAck(p_orig.id, "Server", true, "Jump complete.")
+					GameAPI.sendPlayerCommandAck(p_orig.id, "Navigation", true, "Jump complete.")
 				end
 				return
 			else if p_orig.warping then
 				if (current_ms >= p_orig.warp_end_time) then
 					Server.players[_a].warping = false
 					movePlayer(p_orig.id, p_orig.currentSystem, p_orig.target_proximity)
-					GameAPI.sendPlayerCommandAck(p_orig.id, "Server", true, "Warp complete.")
+					GameAPI.sendPlayerCommandAck(p_orig.id, "Navigation", true, "Warp complete.")
 				end
 				return
 			else

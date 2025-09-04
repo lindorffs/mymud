@@ -52,8 +52,14 @@ namespace RTSEngine {
 			
             bool lua_initialized_ = false;
             bool isRunning_;
-            u_int64_t currentTicks_;
+			
+			#ifdef WIN32
+            uint64_t currentTicks_ = 0;
+            uint64_t lastLogicTick_ = 0;
+			#else			
+            u_int64_t currentTicks_ = 0;
             u_int64_t lastLogicTick_ = 0;
+			#endif
 
             unsigned short serverPort_;
 
