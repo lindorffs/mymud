@@ -9,6 +9,7 @@ function _player(playerId, userId, characterId, name, system, proximity, combat_
 		proximity = proximity,
 		target_proximity = "",
 		target_system = "",
+		on_grid_location = {x = 0, y = 0},
 		warping = false,
 		warp_start_time = 0,
 		jumping = false,

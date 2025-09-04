@@ -13,5 +13,5 @@ function OnGenericPlayerCommand(playerId, commandName, argsTable, selectedIdsTab
         return
 	end
     print("Lua: OnGenericPlayerCommand for P" .. playerId .. " - Unhandled Cmd: " .. commandName)
-    GameAPI.sendPlayerCommandAck(playerId, "Server", false, "Unknown command: " .. commandName)
+    GameAPI.sendPlayerCommandAck(playerId, "cmd.exe", false, "Unknown command: " .. commandName)
 end

@@ -22,7 +22,7 @@ function OnPlayerWhereCommand(playerId, argsTable)
 	local system = Systems[player.currentSystem]
 	local site = system.Sites[player.proximity]
 	
-	GameAPI.sendPlayerCommandAck(playerId, "Server", true, "In proximity of: " .. site.siteName .. ", " .. system.systemName)
+	GameAPI.sendPlayerCommandAck(playerId, "Navigation", true, "In proximity of: " .. site.siteName .. ", " .. system.systemName)
 end
 
 function OnPlayerJumpCommand(playerId, argsTable)
@@ -36,10 +36,10 @@ function OnPlayerJumpCommand(playerId, argsTable)
 	local jump_initiated = false
 	-- The player is only able to Jump to a system if they are in proximity of a site that has a connection to their target.
 	if (#argsTable == 0) then
-		GameAPI.sendPlayerCommandAck(playerId, "Server", false, "Unable to Jump. No System target defined.")
+		GameAPI.sendPlayerCommandAck(playerId, "Navigation", false, "Unable to Jump. No System target defined.")
 		return
 	elseif (#current_site.connections == 0)	then
-		GameAPI.sendPlayerCommandAck(playerId, "Server", false, "Unable to Jump. No Systems to Jump to.")
+		GameAPI.sendPlayerCommandAck(playerId, "Navigation", false, "Unable to Jump. No Systems to Jump to.")
 		return
 	else
 		target_system = argsTable[1]
@@ -55,13 +55,13 @@ function OnPlayerJumpCommand(playerId, argsTable)
 						Server.players[_].jump_end_time = Server.players[_].jump_start_time + (system.distance * 500) -- system.distance * 500 = 2 au/s
 					end
 				end
-				GameAPI.sendPlayerCommandAck(playerId, "Server", true, "Jumping to System. " .. tostring(system.distance / 2) .. " Seconds to Landing.")
+				GameAPI.sendPlayerCommandAck(playerId, "Navigation", true, "Jumping to System. " .. tostring(system.distance / 2) .. " Seconds to Landing.")
 				return
 			end
 		end
 	end
 	if not (site_found) then
-		GameAPI.sendPlayerCommandAck(playerId, "Server", true, "Unable to Jump. No Connection to System.")
+		GameAPI.sendPlayerCommandAck(playerId, "Navigation", true, "Unable to Jump. No Connection to System.")
 	end
 end
 
@@ -77,7 +77,7 @@ function OnPlayerWarpCommand(playerId, argsTable)
 	-- The player is only able to Jump to a system if they are in proximity of a site that has a connection to their target.
 	print(current_system.Sites)
 	if (#argsTable == 0) then
-		GameAPI.sendPlayerCommandAck(playerId, "Server", false, "Unable to Warp. No System target defined.")
+		GameAPI.sendPlayerCommandAck(playerId, "Navigation", false, "Unable to Warp. No System target defined.")
 		return
 	else
 		target_site = argsTable[1]
@@ -92,12 +92,12 @@ function OnPlayerWarpCommand(playerId, argsTable)
 						Server.players[_].warp_end_time = Server.players[_].warp_start_time + (2000) -- system.distance * 500 = 2 au/s
 					end
 				end
-				GameAPI.sendPlayerCommandAck(playerId, "Server", true, "Warping to Site. " .. "2 Seconds to Landing.")
+				GameAPI.sendPlayerCommandAck(playerId, "Navigation", true, "Warping to Site. " .. "2 Seconds to Landing.")
 				return
 			end
 		end
 	end
 	if not (site_found) then
-		GameAPI.sendPlayerCommandAck(playerId, "Server", true, "Unable to Warp. Site Not Found.")
+		GameAPI.sendPlayerCommandAck(playerId, "Navigation", true, "Unable to Warp. Site Not Found.")
 	end
 end
