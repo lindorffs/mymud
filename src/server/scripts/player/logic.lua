@@ -71,19 +71,18 @@ function SendPlayerUpdate()
 	for _, p_orig in ipairs(Server.players) do
 		local system = getSystemData(p_orig.currentSystem)
 		local site = system.Sites[p_orig.proximity]
-		print(p_orig.currentSystem, p_orig.proximity)
 		local proximity = ""
 		if p_orig.jumping then
 			proximity = "In Jump"
 		elseif p_orig.warping then
 			proximity = "In Warp"
 		else
-			proximity = site.description
+			proximity = site.siteName
 		end
 		GameAPI.sendMessageToPlayer(p_orig.id, "PLAYER_INFO", {
 			you = true,
 			name = p_orig.name,
-			system = system.description,
+			system = system.systemName,
 			proximity = proximity,
 			combat_xp = p_orig.xp.combat,
 			explore_xp = p_orig.xp.explore
