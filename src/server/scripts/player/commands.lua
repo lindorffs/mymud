@@ -7,8 +7,7 @@ function OnPlayerChatMessage(playerId, argsTable)
     print("Lua: P" .. playerId .. " (" .. sending_player.name .. ") says: " .. chatText)
 	
 	for _, receiving_player in pairs(Systems[sending_player.currentSystem].players) do
-		receiving_player = GetPlayerById(receiving_player)
-		GameAPI.sendMessageToPlayer(receiving_player.id, "CHAT_BROADCAST", {
+		GameAPI.sendMessageToPlayer(receiving_player, "CHAT_BROADCAST", {
 			sender_player_id = playerId,
 			sender_name = sending_player.name,
 			text = chatText
