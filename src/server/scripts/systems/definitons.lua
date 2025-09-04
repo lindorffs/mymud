@@ -1,5 +1,6 @@
 Systems = {
 	Cygnus_Prime = {
+		systemName = "Cygnus Prime",
 		description = "Cygnus Prime",
 		players = {},
 		Sites = {
@@ -20,6 +21,7 @@ Systems = {
 		}
 	},
 	Delta_Pyre = {
+		systemName = "Delta Pyre",
 		description = "Delta Pyre",
 		players = {},
 		Sites = {
