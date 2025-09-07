@@ -59,6 +59,16 @@ namespace RTSEngine {
 			std::string proximity = "";
 			unsigned int combat_xp = 0;
 			unsigned int explore_xp = 0;
+			unsigned int trade_xp = 0;
+			unsigned int mining_xp = 0;
+			unsigned int diplomacy_xp = 0;
+			unsigned int processing_xp = 0;
+			unsigned int research_xp = 0;
+			unsigned int influence_xp = 0;
+			unsigned int archaeology_xp = 0;
+			unsigned int trade_illegal_xp = 0;
+			int grid_x;
+			int grid_y;
 			bool you;
 
             friend class boost::serialization::access;
@@ -69,6 +79,16 @@ namespace RTSEngine {
 				ar & proximity;
 				ar & combat_xp;
 				ar & explore_xp;
+				ar & trade_xp;
+				ar & mining_xp;
+				ar & diplomacy_xp;
+				ar & processing_xp;
+				ar & research_xp;
+				ar & influence_xp;
+				ar & archaeology_xp;
+				ar & trade_illegal_xp;
+				ar & grid_x;
+				ar & grid_y;
 				ar & you;
             }
         };
@@ -117,6 +137,29 @@ namespace RTSEngine {
             }
         };
 		
+		struct SiteSystemData {
+			std::string name = "";
+			int32_t x;
+			int32_t y;
+			
+            friend class boost::serialization::access;
+            template<class Archive>
+            void serialize(Archive & ar, const unsigned int version) {
+                ar & name;
+				ar & x;
+				ar & y;
+            }
+		};
+		
+		struct SystemDataPayload {
+			std::vector<struct SiteSystemData> sites;
+			
+			friend class boost::serialization::access;
+			template<class Archive>
+			void serialize(Archive & ar, const unsigned int version) {
+				ar & sites;
+			}
+		};
 		
 		struct TextMessagePayload {
             std::string text;

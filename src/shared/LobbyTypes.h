@@ -51,6 +51,8 @@ namespace RTSEngine {
 			std::string description = "";
 			std::vector<std::string> connections;
 			std::vector<SiteInformation> sites;
+			int x;
+			int y;
 			
 			friend class boost::serialization::access;
             template<class Archive>
@@ -59,7 +61,9 @@ namespace RTSEngine {
 				ar & description;
                 ar & connections;
 				ar & sites;
-            }
+				ar & x;
+				ar & y;
+			}
 		};
     } // namespace Core
 } // namespace RTSEngine
