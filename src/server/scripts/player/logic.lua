@@ -20,7 +20,6 @@ function GetIPSanitizedPlayersTable()
 end
 
 function movePlayer(playerId, system_key, site_key)
-	print(system_key, site_key)
 	local player = GetPlayerById(playerId)
 	for _, p in ipairs(Systems[player.currentSystem].players) do
 		if p == playerId then
@@ -28,6 +27,11 @@ function movePlayer(playerId, system_key, site_key)
 		end
 	end
 	table.insert(Systems[system_key].players, playerId)
+	if (system_key ~= player.currentSystem) then
+		GameAPI.sendMessageToPlayer(playerId, "SYSTEM_DATA", {
+			system = Systems[system_key]
+		})
+	end
 	for _, p in ipairs(Server.players) do
         if p.id == playerId then
 			Server.players[_].currentSystem = system_key
@@ -85,7 +89,15 @@ function SendPlayerUpdate()
 			system = system.systemName,
 			proximity = proximity,
 			combat_xp = p_orig.xp.combat,
-			explore_xp = p_orig.xp.explore
+			explore_xp = p_orig.xp.explore,
+			trade_xp = p_orig.xp.trade,
+			mining_xp = p_orig.xp.mining,
+			diplomacy_xp = 0,
+			processing_xp = 0,
+			research_xp = 0,
+			influence_xp = 0,
+			archaeology_xp = 0,
+			trade_illegal_xp = 0
 		})
 	end
 end

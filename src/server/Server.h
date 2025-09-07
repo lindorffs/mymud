@@ -42,8 +42,7 @@ namespace RTSEngine {
         class Server {
         const int SERVER_TICK_RATE_MS = 75;
         private:
-			void writeCharacterData_Lua(int id, const std::string& system, const std::string& proximity, int xp_combat, int xp_explore);
-
+			void writeCharacterData_Lua(int id, const std::string& system, const std::string& proximity, unsigned int combat_xp, unsigned int explore_xp, unsigned int trade_xp, unsigned int mining_xp);
 			std::map<int, LobbyPlayerInfo> client_lobby_players_; // Keyed by player ID
 			bool isInLobby_ = false; // True when connected and before game starts
 

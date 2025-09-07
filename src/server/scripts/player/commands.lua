@@ -50,16 +50,20 @@ function OnPlayerJumpCommand(playerId, argsTable)
 		for _, system in pairs(current_site.connections) do
 			if (system.target_system == target_system) then
 				site_found = true
+				local target_system_location = getSystemData(target_system)["location"]
+				local current_system_location = current_system["location"]
+				local distance = math.sqrt((target_system_location.x - current_system_location.x)^2 + (target_system_location.y - current_system_location.y)^2)
+				
 				for _, p in ipairs(Server.players) do
 					if p.id == playerId then
 						Server.players[_].jumping = true
 						Server.players[_].target_system = system.target_system
 						Server.players[_].target_proximity = system.target_proximity
 						Server.players[_].jump_start_time = os.time() * 1000
-						Server.players[_].jump_end_time = Server.players[_].jump_start_time + (system.distance * 500) -- system.distance * 500 = 2 au/s
+						Server.players[_].jump_end_time = Server.players[_].jump_start_time + (distance * 1000)/2 -- (system.distance * 1000)/2 = 2 gu/s
 					end
 				end
-				GameAPI.sendPlayerCommandAck(playerId, "Navigation", true, "Jumping to System. " .. tostring(system.distance / 2) .. " Seconds to Landing.")
+				GameAPI.sendPlayerCommandAck(playerId, "Navigation", true, "Jumping to System. " .. tostring(distance) .. " Seconds to Landing.")
 				return
 			end
 		end

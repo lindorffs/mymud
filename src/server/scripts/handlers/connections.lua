@@ -1,7 +1,7 @@
-function OnPlayerAccepted(playerId, userId, characterId, name, system, proximity, combat_xp, explore_xp)
-    --print("Lua: OnPlayerAccepted - Player ID: " .. playerId .. ", User ID: " .. userId .. ", Name: ".. name)
+function OnPlayerAccepted(playerId, userId, characterId, name, system, proximity, combat_xp, explore_xp, trade_xp, mining_xp)
+    print("Lua: OnPlayerAccepted - Player ID: " .. playerId .. ", User ID: " .. userId .. ", Name: ".. name)
 
-    local newPlayer = _player(playerId, userId, characterId, name, system, proximity, combat_xp, explore_xp)
+    local newPlayer = _player(playerId, userId, characterId, name, system, proximity, combat_xp, explore_xp, trade_xp, mining_xp)
     table.insert(Server.players, newPlayer)
 	table.insert(Systems[system].players, newPlayer.id)
     print("Lua: Player " .. playerId .. " (" .. newPlayer.name .. ") added to Server. Total: " .. #Server.players)
@@ -11,12 +11,22 @@ function OnPlayerAccepted(playerId, userId, characterId, name, system, proximity
 	GameAPI.sendMessageToPlayer(playerId, "PLAYER_INFO", {
 		you = true,
 		name = newPlayer.name,
-		system = system_.description,
-		proximity = site.description,
+		system = system_.systemName,
+		proximity = site.siteName,
 		combat_xp = newPlayer.xp.combat,
-		explore_xp = newPlayer.xp.explore
+		explore_xp = newPlayer.xp.explore,
+		trade_xp = newPlayer.xp.trade,
+		mining_xp = newPlayer.xp.mining,
+		diplomacy_xp = 0,
+		processing_xp = 0,
+		research_xp = 0,
+		influence_xp = 0,
+		trade_illegal_xp = 0
 	})
 	GameAPI.sendMessageToPlayer(playerId, "MAP_DATA", {systems=Systems})
+	GameAPI.sendMessageToPlayer(playerId, "SYSTEM_DATA", {
+		system = system_
+	})
 end
 
 function OnPlayerDisconnected(playerId)
@@ -27,7 +37,8 @@ function OnPlayerDisconnected(playerId)
         if p.id == playerId then
             playerIndex = i
             disconnectedPlayerName = p.name
-			GameAPI.writeCharacterData(p.characterId, p.currentSystem, p.proximity, p.xp.combat, p.xp.explore)
+			GameAPI.writeCharacterData(p.characterId, p.currentSystem, p.proximity, p.xp.combat, p.xp.explore,
+			p.xp.trade, p.xp.mining)
             break
         end
     end
