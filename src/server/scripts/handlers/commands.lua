@@ -11,6 +11,9 @@ function OnGenericPlayerCommand(playerId, commandName, argsTable, selectedIdsTab
 	elseif commandName == "warp" then -- Handle chat from generic if C++ routes it here
         OnPlayerWarpCommand(playerId, argsTable)
         return
+	elseif commandName == "goto" then -- Handle chat from generic if C++ routes it here
+        OnPlayerGotoCommand(playerId, argsTable)
+        return
 	end
     print("Lua: OnGenericPlayerCommand for P" .. playerId .. " - Unhandled Cmd: " .. commandName)
     GameAPI.sendPlayerCommandAck(playerId, "cmd.exe", false, "Unknown command: " .. commandName)

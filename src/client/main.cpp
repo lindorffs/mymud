@@ -4,10 +4,11 @@
 #include <string>
 #include <vector>
 
+bool startAsServer = false;
+std::string serverIp = "64.91.240.185"; // Default for client, or if server hosts locally
+unsigned short serverPort = 12345;    // Default port
+
 int main(int argc, char* argv[]) {
-    bool startAsServer = false;
-    std::string serverIp = "127.0.0.1"; // Default for client, or if server hosts locally
-    unsigned short serverPort = 12345;    // Default port
 
     for (int i = 1; i < argc; ++i) {
         std::string arg = argv[i];

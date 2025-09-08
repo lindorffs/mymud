@@ -1,8 +1,6 @@
 // In Game.cpp
 #include "Game.h"
 #include "../Config.h"
-#include "../../shared/NetworkMessageTypes.h" // Our enum
-#include "../../shared/NetworkMessages.h"   // Our message structs
 #include <sstream>                       // For std::stringstream
 #include <boost/archive/text_oarchive.hpp> // For sending
 #include <boost/archive/text_iarchive.hpp> // For receiving
@@ -13,6 +11,8 @@
 #include <algorithm>
 #include <random>
 #include <sstream>
+#include <cmath>
+#define M_PI 3.14159265358979323846
 // For cJSON for message serialization (example)
 #include <cJSON.h> // Assuming it's in include path now
 
@@ -235,7 +235,95 @@ namespace RTSEngine {
             renderer_ = nullptr;
             window_ = nullptr;
         }
-		
+		void SetupImGuiStyle()
+{
+	// Material Flat style by ImJC1C from ImThemes
+	ImGuiStyle& style = ImGui::GetStyle();
+	
+	style.Alpha = 1.0f;
+	style.DisabledAlpha = 0.5f;
+	style.WindowPadding = ImVec2(8.0f, 8.0f);
+	style.WindowRounding = 0.0f;
+	style.WindowBorderSize = 1.0f;
+	style.WindowMinSize = ImVec2(32.0f, 32.0f);
+	style.WindowTitleAlign = ImVec2(0.0f, 0.5f);
+	style.WindowMenuButtonPosition = ImGuiDir_Left;
+	style.ChildRounding = 0.0f;
+	style.ChildBorderSize = 1.0f;
+	style.PopupRounding = 0.0f;
+	style.PopupBorderSize = 1.0f;
+	style.FramePadding = ImVec2(4.0f, 3.0f);
+	style.FrameRounding = 0.0f;
+	style.FrameBorderSize = 0.0f;
+	style.ItemSpacing = ImVec2(8.0f, 4.0f);
+	style.ItemInnerSpacing = ImVec2(4.0f, 4.0f);
+	style.CellPadding = ImVec2(4.0f, 2.0f);
+	style.IndentSpacing = 21.0f;
+	style.ColumnsMinSpacing = 6.0f;
+	style.ScrollbarSize = 14.0f;
+	style.ScrollbarRounding = 0.0f;
+	style.GrabMinSize = 10.0f;
+	style.GrabRounding = 0.0f;
+	style.TabRounding = 0.0f;
+	style.TabBorderSize = 0.0f;
+	style.ColorButtonPosition = ImGuiDir_Left;
+	style.ButtonTextAlign = ImVec2(0.5f, 0.5f);
+	style.SelectableTextAlign = ImVec2(0.0f, 0.0f);
+	
+	style.Colors[ImGuiCol_Text] = ImVec4(0.8313725590705872f, 0.8470588326454163f, 0.8784313797950745f, 1.0f);
+	style.Colors[ImGuiCol_TextDisabled] = ImVec4(0.8313725590705872f, 0.8470588326454163f, 0.8784313797950745f, 0.501960813999176f);
+	style.Colors[ImGuiCol_WindowBg] = ImVec4(0.1725490242242813f, 0.1921568661928177f, 0.2352941185235977f, 1.0f);
+	style.Colors[ImGuiCol_ChildBg] = ImVec4(0.0f, 0.0f, 0.0f, 0.1587982773780823f);
+	style.Colors[ImGuiCol_PopupBg] = ImVec4(0.1725490242242813f, 0.1921568661928177f, 0.2352941185235977f, 1.0f);
+	style.Colors[ImGuiCol_Border] = ImVec4(0.2039215713739395f, 0.2313725501298904f, 0.2823529541492462f, 1.0f);
+	style.Colors[ImGuiCol_BorderShadow] = ImVec4(0.0f, 0.0f, 0.0f, 0.0f);
+	style.Colors[ImGuiCol_FrameBg] = ImVec4(0.105882354080677f, 0.1137254908680916f, 0.1372549086809158f, 0.501960813999176f);
+	style.Colors[ImGuiCol_FrameBgHovered] = ImVec4(0.3098039329051971f, 0.6235294342041016f, 0.9333333373069763f, 0.250980406999588f);
+	style.Colors[ImGuiCol_FrameBgActive] = ImVec4(0.3098039329051971f, 0.6235294342041016f, 0.9333333373069763f, 1.0f);
+	style.Colors[ImGuiCol_TitleBg] = ImVec4(0.105882354080677f, 0.1137254908680916f, 0.1372549086809158f, 1.0f);
+	style.Colors[ImGuiCol_TitleBgActive] = ImVec4(0.105882354080677f, 0.1137254908680916f, 0.1372549086809158f, 1.0f);
+	style.Colors[ImGuiCol_TitleBgCollapsed] = ImVec4(0.105882354080677f, 0.1137254908680916f, 0.1372549086809158f, 1.0f);
+	style.Colors[ImGuiCol_MenuBarBg] = ImVec4(0.105882354080677f, 0.1137254908680916f, 0.1372549086809158f, 1.0f);
+	style.Colors[ImGuiCol_ScrollbarBg] = ImVec4(0.01960784383118153f, 0.01960784383118153f, 0.01960784383118153f, 0.0f);
+	style.Colors[ImGuiCol_ScrollbarGrab] = ImVec4(0.5333333611488342f, 0.5333333611488342f, 0.5333333611488342f, 1.0f);
+	style.Colors[ImGuiCol_ScrollbarGrabHovered] = ImVec4(0.3333333432674408f, 0.3333333432674408f, 0.3333333432674408f, 1.0f);
+	style.Colors[ImGuiCol_ScrollbarGrabActive] = ImVec4(0.6000000238418579f, 0.6000000238418579f, 0.6000000238418579f, 1.0f);
+	style.Colors[ImGuiCol_CheckMark] = ImVec4(0.3098039329051971f, 0.6235294342041016f, 0.9333333373069763f, 1.0f);
+	style.Colors[ImGuiCol_SliderGrab] = ImVec4(0.239215686917305f, 0.5215686559677124f, 0.8784313797950745f, 1.0f);
+	style.Colors[ImGuiCol_SliderGrabActive] = ImVec4(0.2588235437870026f, 0.5882353186607361f, 0.9803921580314636f, 1.0f);
+	style.Colors[ImGuiCol_Button] = ImVec4(0.1529411822557449f, 0.1725490242242813f, 0.2117647081613541f, 0.501960813999176f);
+	style.Colors[ImGuiCol_ButtonHovered] = ImVec4(0.1529411822557449f, 0.1725490242242813f, 0.2117647081613541f, 1.0f);
+	style.Colors[ImGuiCol_ButtonActive] = ImVec4(0.3098039329051971f, 0.6235294342041016f, 0.9333333373069763f, 1.0f);
+	style.Colors[ImGuiCol_Header] = ImVec4(0.1529411822557449f, 0.1725490242242813f, 0.2117647081613541f, 1.0f);
+	style.Colors[ImGuiCol_HeaderHovered] = ImVec4(0.3098039329051971f, 0.6235294342041016f, 0.9333333373069763f, 0.250980406999588f);
+	style.Colors[ImGuiCol_HeaderActive] = ImVec4(0.3098039329051971f, 0.6235294342041016f, 0.9333333373069763f, 1.0f);
+	style.Colors[ImGuiCol_Separator] = ImVec4(0.4274509847164154f, 0.4274509847164154f, 0.4980392158031464f, 0.5f);
+	style.Colors[ImGuiCol_SeparatorHovered] = ImVec4(0.09803921729326248f, 0.4000000059604645f, 0.7490196228027344f, 0.7799999713897705f);
+	style.Colors[ImGuiCol_SeparatorActive] = ImVec4(0.09803921729326248f, 0.4000000059604645f, 0.7490196228027344f, 1.0f);
+	style.Colors[ImGuiCol_ResizeGrip] = ImVec4(0.105882354080677f, 0.1137254908680916f, 0.1372549086809158f, 1.0f);
+	style.Colors[ImGuiCol_ResizeGripHovered] = ImVec4(0.3098039329051971f, 0.6235294342041016f, 0.9333333373069763f, 0.250980406999588f);
+	style.Colors[ImGuiCol_ResizeGripActive] = ImVec4(0.3098039329051971f, 0.6235294342041016f, 0.9333333373069763f, 1.0f);
+	style.Colors[ImGuiCol_Tab] = ImVec4(0.1529411822557449f, 0.1725490242242813f, 0.2117647081613541f, 1.0f);
+	style.Colors[ImGuiCol_TabHovered] = ImVec4(0.3098039329051971f, 0.6235294342041016f, 0.9333333373069763f, 0.250980406999588f);
+	style.Colors[ImGuiCol_TabActive] = ImVec4(0.3098039329051971f, 0.6235294342041016f, 0.9333333373069763f, 1.0f);
+	style.Colors[ImGuiCol_TabUnfocused] = ImVec4(0.1529411822557449f, 0.1725490242242813f, 0.2117647081613541f, 1.0f);
+	style.Colors[ImGuiCol_TabUnfocusedActive] = ImVec4(0.3098039329051971f, 0.6235294342041016f, 0.9333333373069763f, 1.0f);
+	style.Colors[ImGuiCol_PlotLines] = ImVec4(0.6078431606292725f, 0.6078431606292725f, 0.6078431606292725f, 1.0f);
+	style.Colors[ImGuiCol_PlotLinesHovered] = ImVec4(1.0f, 0.4274509847164154f, 0.3490196168422699f, 1.0f);
+	style.Colors[ImGuiCol_PlotHistogram] = ImVec4(0.8980392217636108f, 0.6980392336845398f, 0.0f, 1.0f);
+	style.Colors[ImGuiCol_PlotHistogramHovered] = ImVec4(1.0f, 0.6000000238418579f, 0.0f, 1.0f);
+	style.Colors[ImGuiCol_TableHeaderBg] = ImVec4(0.105882354080677f, 0.1137254908680916f, 0.1372549086809158f, 1.0f);
+	style.Colors[ImGuiCol_TableBorderStrong] = ImVec4(0.2039215713739395f, 0.2313725501298904f, 0.2823529541492462f, 1.0f);
+	style.Colors[ImGuiCol_TableBorderLight] = ImVec4(0.2039215713739395f, 0.2313725501298904f, 0.2823529541492462f, 0.5021458864212036f);
+	style.Colors[ImGuiCol_TableRowBg] = ImVec4(0.0f, 0.0f, 0.0f, 0.0f);
+	style.Colors[ImGuiCol_TableRowBgAlt] = ImVec4(1.0f, 1.0f, 1.0f, 0.03862661123275757f);
+	style.Colors[ImGuiCol_TextSelectedBg] = ImVec4(0.2039215713739395f, 0.2313725501298904f, 0.2823529541492462f, 1.0f);
+	style.Colors[ImGuiCol_DragDropTarget] = ImVec4(1.0f, 1.0f, 0.0f, 0.8999999761581421f);
+	style.Colors[ImGuiCol_NavHighlight] = ImVec4(0.2588235437870026f, 0.5882353186607361f, 0.9764705896377563f, 1.0f);
+	style.Colors[ImGuiCol_NavWindowingHighlight] = ImVec4(0.2039215713739395f, 0.2313725501298904f, 0.2823529541492462f, 0.7529411911964417f);
+	style.Colors[ImGuiCol_NavWindowingDimBg] = ImVec4(0.105882354080677f, 0.1137254908680916f, 0.1372549086809158f, 0.7529411911964417f);
+	style.Colors[ImGuiCol_ModalWindowDimBg] = ImVec4(0.105882354080677f, 0.1137254908680916f, 0.1372549086809158f, 0.7529411911964417f);
+}
         // Modified initSDL
         bool Game::initSDL(bool requireGraphics) {
             if (SDL_Init(requireGraphics ? SDL_INIT_VIDEO | SDL_INIT_EVENTS : SDL_INIT_EVENTS) == 0) { // Only init video if needed
@@ -282,19 +370,21 @@ namespace RTSEngine {
                 SDL_StartTextInput(window_);
 				ImGui::CreateContext();
 				
-				ImGuiIO& io_context = ImGui::GetIO(); (void)io_context;
-				io_context.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
-				
-				ImGui::StyleColorsDark();
-				ImGuiStyle& style = ImGui::GetStyle();
-				style.ScaleAllSizes(g_displayScale);        // Bake a fixed style scale. (until we have a solution for dynamic style scaling, changing this requires resetting Style + calling this again)
-				style.FontScaleDpi = g_displayScale;  
-				style.FontSizeBase = 16.0f;
+				ImGuiIO& io = ImGui::GetIO();
+				io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+				io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
+				io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+				io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
+				SetupImGuiStyle();
 				ImGui_ImplSDL3_InitForSDLRenderer(window_, renderer_);
 				ImGui_ImplSDLRenderer3_Init(renderer_);
-				font_title = io_context.Fonts->AddFontFromFileTTF("./assets/fonts/default.ttf", 19.0f);
-				font_subtitle = io_context.Fonts->AddFontFromFileTTF("./assets/fonts/default.ttf", 17.0f);
-				font_description = io_context.Fonts->AddFontFromFileTTF("./assets/fonts/default.ttf", 15.0f);
+				font_title = io.Fonts->AddFontFromFileTTF("./assets/fonts/default.ttf", 19.0f);
+				font_subtitle = io.Fonts->AddFontFromFileTTF("./assets/fonts/default.ttf", 17.0f);
+				font_description = io.Fonts->AddFontFromFileTTF("./assets/fonts/default.ttf", 15.0f);
+				
+				grid_render_target = SDL_CreateTexture(renderer_,SDL_PIXELFORMAT_RGBA8888,SDL_TEXTUREACCESS_TARGET,250, 250);
+				system_render_target = SDL_CreateTexture(renderer_,SDL_PIXELFORMAT_RGBA8888,SDL_TEXTUREACCESS_TARGET,250, 250);
+				map_render_target = SDL_CreateTexture(renderer_,SDL_PIXELFORMAT_RGBA8888,SDL_TEXTUREACCESS_TARGET,250, 250);
             }
             return true;
         }
@@ -561,7 +651,21 @@ namespace RTSEngine {
 								myPlayer.proximity = player_info_msg.proximity;
 								myPlayer.combat_xp = player_info_msg.combat_xp;
 								myPlayer.explore_xp = player_info_msg.explore_xp;
+								myPlayer.mining_xp = player_info_msg.mining_xp;
+								myPlayer.processing_xp = player_info_msg.processing_xp;
+								myPlayer.research_xp = player_info_msg.research_xp;
+								myPlayer.archaeology_xp = player_info_msg.archaeology_xp;
+								myPlayer.influence_xp = player_info_msg.influence_xp;
+								myPlayer.diplomacy_xp = player_info_msg.diplomacy_xp;
+								myPlayer.trade_xp = player_info_msg.trade_xp;
+								myPlayer.illegal_trade_xp = player_info_msg.trade_illegal_xp;
+								myPlayer.grid_location.x = player_info_msg.grid_x;
+								myPlayer.grid_location.y = player_info_msg.grid_y;
+								myPlayer.site_location.x = player_info_msg.site_x;
+								myPlayer.site_location.y = player_info_msg.site_y;
 							}
+							
+							this->site_entities = std::move(player_info_msg.site_entities);
                         }
 						break;
 						case Network::NetworkMsgType::S2C_MAP_DATA:
@@ -571,6 +675,30 @@ namespace RTSEngine {
 							std::cout << "Client: Received map data with " << received_payload.systems.size() << " systems." << std::endl;
 							
 							this->systems = std::move(received_payload.systems);
+						}
+						break;
+						case Network::NetworkMsgType::S2C_SYSTEM_DATA:
+						{
+							Network::SystemDataPayload recieved_payload;
+							ia >> recieved_payload;
+							
+							this->current_system.sites = std::move(recieved_payload.sites);
+							this->current_system.x = recieved_payload.x;
+							this->current_system.y = recieved_payload.y;
+							
+							std::cout << "Client: Recieved system data with " << this->current_system.sites.size() << " sites." << std::endl;
+						}
+						break;
+						case Network::NetworkMsgType::S2C_SITE_DATA:
+						{
+							Network::SiteDataPayload recieved_payload;
+							ia >> recieved_payload;
+							
+							this->current_site.objects = std::move(recieved_payload.objects);
+							this->current_site.x = recieved_payload.x;
+							this->current_site.y = recieved_payload.y;
+							
+							std::cout << "Client: Recieved site data with " << recieved_payload.objects.size() << " objects." << std::endl;
 						}
 						break;
 						
@@ -858,7 +986,22 @@ namespace RTSEngine {
 		void Game::updateDisconnected() {
 		}
 
-		static int seed = 0;
+		void drawCircleTrig(SDL_Renderer* renderer, int centerX, int centerY, int radius) {
+			for (int angle = 0; angle < 360; ++angle) {
+				double rad = angle * M_PI / 180.0;
+				int x = centerX + (int)(radius * cos(rad));
+				int y = centerY + (int)(radius * sin(rad));
+				SDL_RenderPoint(renderer, x, y);
+			}
+		}
+
+		int seed = 0;
+		double radarAngle = 0.0; // In radians
+		int radarCenterX = 125;
+		int radarCenterY = 125;
+		int radarRadius = 100; // Adjust the radius of your radar line as needed
+		int lineEndX = 0;
+		int lineEndY = 0;
 		void Game::renderClient() {
 			
 			SDL_SetRenderDrawColor(renderer_, 0, 0, 0, 255);
@@ -883,13 +1026,72 @@ namespace RTSEngine {
 					uiManager_.renderConnectingScreen(connection_status_message_);
 					break;
 				case ClientGameState::IN_LOBBY:
-					
-					uiManager_.renderLobbyScreen(client_lobby_players_, myPlayerId_, lobbyMaxPlayers_, commandLine_, this);
+					SDL_SetRenderTarget(renderer_, grid_render_target);
+						SDL_SetRenderDrawColor(renderer_, 0, 0, 0, 255);
+						SDL_RenderClear(renderer_);
+						
+						SDL_SetRenderDrawColor(renderer_, 55, 255, 55, 255);
+						for (auto object: current_site.objects) {
+							//std::cout << "Rendering object at " << object.x << ", " << object.y << std::endl;
+							drawCircleTrig(renderer_, 125+object.x, 125+object.y, 1);
+						}
+						for (auto entity: site_entities) {
+							//std::cout << "Rendering entity." << std::endl;
+							if (entity.id != myPlayerId_) {
+								drawCircleTrig(renderer_, 125+entity.x, 125+entity.y, 1);
+							}
+						}
+						
+						radarCenterX = 125 + myPlayer.grid_location.x;
+						radarCenterY = 125 + myPlayer.grid_location.y;
+						radarRadius = 100; // Adjust the radius of your radar line as needed
+						radarAngle += 0.0025; // Adjust this value to change the rotation speed
+						if (radarAngle > 2 * M_PI) { // M_PI is from <cmath> or define it as 3.14159...
+							radarAngle -= 2 * M_PI;
+						}
+						lineEndX = radarCenterX + static_cast<int>(radarRadius * cos(radarAngle));
+						lineEndY = radarCenterY + static_cast<int>(radarRadius * sin(radarAngle));
+						
+						SDL_SetRenderDrawColor(renderer_, 55, 255, 55, 255);
+						SDL_RenderLine(renderer_, radarCenterX, radarCenterY, lineEndX, lineEndY);
+						drawCircleTrig(renderer_, 125+myPlayer.grid_location.x, 125+myPlayer.grid_location.y, 1);
+						SDL_SetRenderDrawColor(renderer_, 0, 0, 0, 255);
+						
+					SDL_SetRenderTarget(renderer_, system_render_target);
+						SDL_SetRenderDrawColor(renderer_, 0, 0, 0, 255);
+						SDL_RenderClear(renderer_);
+						
+						SDL_SetRenderDrawColor(renderer_, 55, 255, 55, 255);
+						for (auto site: current_system.sites) {
+							if (site.x == myPlayer.site_location.x && site.y == myPlayer.site_location.y){
+								SDL_SetRenderDrawColor(renderer_, 255, 55, 255, 255);
+								drawCircleTrig(renderer_, 125+site.x, 125+site.y, 1);
+								SDL_SetRenderDrawColor(renderer_, 55, 255, 55, 255);
+							} else {
+								drawCircleTrig(renderer_, 125+site.x, 125+site.y, 1);
+							}
+						}
+						
+					SDL_SetRenderTarget(renderer_, map_render_target);
+						SDL_SetRenderDrawColor(renderer_, 0, 0, 0, 255);
+						SDL_RenderClear(renderer_);
+						
+						SDL_SetRenderDrawColor(renderer_, 55, 255, 55, 255);
+						for (auto system: systems) {
+							if (system.x == current_system.x && system.y == current_system.y){
+								SDL_SetRenderDrawColor(renderer_, 255, 55, 255, 255);
+								drawCircleTrig(renderer_, 125+system.x, 125+system.y, 1);
+								SDL_SetRenderDrawColor(renderer_, 55, 255, 55, 255);
+							} else {
+								drawCircleTrig(renderer_, 125+system.x, 125+system.y, 1);
+							}
+						}
+						
+					SDL_SetRenderTarget(renderer_, NULL);
+					uiManager_.renderLobbyScreen(client_lobby_players_, myPlayerId_, lobbyMaxPlayers_, commandLine_, this, grid_render_target, system_render_target, map_render_target);
 					break;
 				case ClientGameState::LOADING_MAP:
 					uiManager_.renderLoadingScreen("...");
-					break;
-				case ClientGameState::IN_GAME:
 					break;
 				case ClientGameState::DISCONNECTED:
 					uiManager_.renderDisconnectedScreen(disconnect_message, this);
@@ -898,8 +1100,10 @@ namespace RTSEngine {
 					break;
 			}
 			
+			
 			ImGui::Render();
 			ImGui_ImplSDLRenderer3_RenderDrawData(ImGui::GetDrawData(), renderer_);
+			SDL_SetRenderViewport(renderer_, NULL);
 			SDL_RenderPresent(renderer_);
 		}
 

@@ -180,7 +180,7 @@ $(OBJ_DIR_WIN32)/%.o: %.c
 
 # --- Clean Target ---
 clean:
-	-@rm -rf $(OUTPUT_DIR_LINUX) $(OUTPUT_DIR_WIN32)
+	-@rm -rf $(OUTPUT_DIR_LINUX) $(OUTPUT_DIR_WIN32)/*.exe
 	-@rm -rf $(OBJ_DIR_LINUX) $(OBJ_DIR_WIN32)
 	-@rm -rf $(DEPS_DIR_LINUX) $(DEPS_DIR_WIN32)
 	@echo "Cleaned project files and build artifacts."

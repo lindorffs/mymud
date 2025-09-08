@@ -53,6 +53,21 @@ namespace RTSEngine {
                 ar & systems;
             }
         };
+		
+		
+		struct SiteEntityData {
+			int id = 0;
+			int x = 0;
+			int y = 0;
+            friend class boost::serialization::access;
+            template<class Archive>
+            void serialize(Archive & ar, const unsigned int version) {
+                ar & id;
+				ar & x;
+				ar & y;
+            }
+		};
+		
 		struct PlayerNetInfo {
             std::string name = "Unknown";
 			std::string system = "";
@@ -67,9 +82,14 @@ namespace RTSEngine {
 			unsigned int influence_xp = 0;
 			unsigned int archaeology_xp = 0;
 			unsigned int trade_illegal_xp = 0;
-			int grid_x;
-			int grid_y;
-			bool you;
+			int grid_x = 0;
+			int grid_y = 0;
+			int site_x = 0;
+			int site_y = 0;
+			std::vector<struct SiteEntityData> site_entities;
+			//int system_x;
+			//int system_y;
+			bool you = true;
 
             friend class boost::serialization::access;
             template<class Archive>
@@ -89,6 +109,11 @@ namespace RTSEngine {
 				ar & trade_illegal_xp;
 				ar & grid_x;
 				ar & grid_y;
+				ar & site_x;
+				ar & site_y;
+				ar & site_entities;
+				//ar & system_x;
+				//ar & system_y;
 				ar & you;
             }
         };
@@ -137,6 +162,32 @@ namespace RTSEngine {
             }
         };
 		
+		struct SiteObjectData {
+			std::string name = "";
+			int x;
+			int y;
+            friend class boost::serialization::access;
+            template<class Archive>
+            void serialize(Archive & ar, const unsigned int version) {
+                ar & name;
+				ar & x;
+				ar & y;
+            }
+		};
+		
+		struct SiteDataPayload {
+			int x;
+			int y;
+			std::vector<struct SiteObjectData> objects;
+            friend class boost::serialization::access;
+            template<class Archive>
+            void serialize(Archive & ar, const unsigned int version) {
+				ar & x;
+				ar & y;
+				ar & objects;
+            }
+		};
+		
 		struct SiteSystemData {
 			std::string name = "";
 			int32_t x;
@@ -152,11 +203,15 @@ namespace RTSEngine {
 		};
 		
 		struct SystemDataPayload {
+			int x;
+			int y;
 			std::vector<struct SiteSystemData> sites;
 			
 			friend class boost::serialization::access;
 			template<class Archive>
 			void serialize(Archive & ar, const unsigned int version) {
+				ar & x;
+				ar & y;
 				ar & sites;
 			}
 		};

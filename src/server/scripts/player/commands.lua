@@ -47,6 +47,16 @@ function OnPlayerJumpCommand(playerId, argsTable)
 		return
 	else
 		target_system = argsTable[1]
+		local distance_to_jumpgate = 0
+		for _, object in pairs(current_site.objects) do
+			if _ == "Jumpgate" then
+				distance_to_jumpgate = math.sqrt((object.location.x - player.on_grid_location.x)^2 + (object.location.y - player.on_grid_location.y)^2)
+			end
+		end
+		if (distance_to_jumpgate >= 3) then
+			GameAPI.sendPlayerCommandAck(playerId, "Navigation", false, "You are too far from the jumpgate to activate it. Distance: " .. tostring(distance_to_jumpgate))
+			return
+		end
 		for _, system in pairs(current_site.connections) do
 			if (system.target_system == target_system) then
 				site_found = true
@@ -63,7 +73,7 @@ function OnPlayerJumpCommand(playerId, argsTable)
 						Server.players[_].jump_end_time = Server.players[_].jump_start_time + (distance * 1000)/2 -- (system.distance * 1000)/2 = 2 gu/s
 					end
 				end
-				GameAPI.sendPlayerCommandAck(playerId, "Navigation", true, "Jumping to System. " .. tostring(distance) .. " Seconds to Landing.")
+				GameAPI.sendPlayerCommandAck(playerId, "Navigation", true, "Jumping to System. " .. tostring(distance/2) .. " Seconds to Landing.")
 				return
 			end
 		end
@@ -108,4 +118,32 @@ function OnPlayerWarpCommand(playerId, argsTable)
 	if not (site_found) then
 		GameAPI.sendPlayerCommandAck(playerId, "Navigation", true, "Unable to Warp. Site Not Found.")
 	end
+end
+
+function OnPlayerGotoCommand(playerId, argsTable)
+    local player = GetPlayerById(playerId)
+    if not player then return end
+
+    if #argsTable == 0 then
+        GameAPI.sendPlayerCommandAck(playerId, "Navigation", false, "Unable to Goto. No grid target defined.")
+        return
+    end
+
+    local target_x = tonumber(argsTable[1])
+    local target_y = tonumber(argsTable[2])
+
+    if not target_x or not target_y then
+        GameAPI.sendPlayerCommandAck(playerId, "Navigation", false, "Unable to Goto. Invalid grid coordinates. Usage: /goto <x> <y>")
+        return
+    end
+
+    -- Set the player's on_grid_target
+    for _a, p in ipairs(Server.players) do
+        if p.id == playerId then
+            Server.players[_a].on_grid_target = {x = target_x, y = target_y}
+            Server.players[_a].moving_on_grid = true -- A flag to indicate we are moving on the grid
+            GameAPI.sendPlayerCommandAck(playerId, "Navigation", true, "Moving to grid target: " .. target_x .. ", " .. target_y)
+            return
+        end
+    end
 end

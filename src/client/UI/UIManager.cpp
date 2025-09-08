@@ -16,9 +16,12 @@ namespace RTSEngine {
 		static bool render_logout_confirm = false;
 		static bool render_quit_confirm = false;
 		static bool render_disconnect_confirm = true;
-		static bool render_system_list = false;
-		static bool render_command_line = false;
-		static bool render_character_info = false;
+		static bool render_system_list = true;
+		static bool render_command_line = true;
+		static bool render_character_info = true;
+		static bool render_scene = true;
+		static bool render_map = true;
+		static bool render_system = true;
 		const NineSliceBorders side_panel_borders = {11.0f, 11.0f, 11.0f, 11.0f}; // Example: 16px borders
 		const NineSliceBorders top_bar_borders    = {5.0f, 5.0f, 5.0f, 5.0f};    // Example
 		const NineSliceBorders bottom_panel_borders = {11.0f, 11.0f, 11.0f, 11.0f};
@@ -128,10 +131,16 @@ namespace RTSEngine {
 			int winW, winH;
 			SDL_GetWindowSizeInPixels(game->get_window(), &winW, &winH);
 			
-			ImGui::SetNextWindowPos(ImVec2(winW * 0.05f, winH * 0.05f), ImGuiCond_FirstUseEver);
-			ImGui::SetNextWindowSize(ImVec2(winW * 0.9f, winH * 0.9f), ImGuiCond_FirstUseEver);
+			ImGui::SetNextWindowPos(ImVec2(555,30), ImGuiCond_FirstUseEver);
+			ImGui::SetNextWindowSize(ImVec2(365,365), ImGuiCond_FirstUseEver);
 
 			if (!ImGui::Begin("systems.db", &render_system_list)) {
+				if (ImGui::IsItemHovered())
+				{
+					ImGui::BeginTooltip();
+					ImGui::Text("View detailed system information.");
+					ImGui::EndTooltip();
+				}
 				ImGui::End();
 				return;
 			}
@@ -225,15 +234,21 @@ namespace RTSEngine {
 			int winW, winH;
 			SDL_GetWindowSizeInPixels(game->get_window(), &winW, &winH);
 			
-			ImGui::SetNextWindowPos(ImVec2(winW-(winW*0.95), winH-(winH*0.95)), ImGuiCond_FirstUseEver);
-			ImGui::SetNextWindowSize(ImVec2(winW*0.9, winH*0.9), ImGuiCond_FirstUseEver);
+			ImGui::SetNextWindowPos(ImVec2(925,30), ImGuiCond_FirstUseEver);
+			ImGui::SetNextWindowSize(ImVec2(345,365), ImGuiCond_FirstUseEver);
 			
 			if (!ImGui::Begin("character.db", &render_character_info)) {
 				// --- System Name (using Title Font) ---
+				
+				if (ImGui::IsItemHovered())
+				{
+					ImGui::BeginTooltip();
+					ImGui::Text("View information related to your character.");
+					ImGui::EndTooltip();
+				}
 				ImGui::End();
 				return;
 			} else {
-				
 				ImGui::Text("Name: "); ImGui::SameLine();
 				
 				ImGui::PushFont(game->font_title);
@@ -252,21 +267,43 @@ namespace RTSEngine {
 				ImGui::PushFont(game->font_description);
 				ImGui::TextWrapped("%s, %s", game->myPlayer.proximity.c_str(), game->myPlayer.system.c_str());
 				ImGui::PopFont();
-				
-				ImGui::PushFont(game->font_subtitle);
-				ImGui::Text("Experience:");
-				ImGui::PopFont();
-				ImGui::Separator();
+				if (ImGui::BeginTabBar("CharacterTabBar")) {
+					if (ImGui::BeginTabItem("Experience")) {
+						ImGui::PushFont(game->font_subtitle);
+						ImGui::Text("Experience:");
+						ImGui::PopFont();
+						ImGui::Separator();
 
-				// Push the description font for the content inside the box
-				ImGui::PushFont(game->font_description);
-				ImGui::BulletText("Combat:");
-				ImGui::SameLine();
-				ImGui::Text("(%d)", game->myPlayer.combat_xp);
-				ImGui::BulletText("Exploration:");
-				ImGui::SameLine();
-				ImGui::Text("(%d)", game->myPlayer.explore_xp);
-				ImGui::PopFont();
+						// Push the description font for the content inside the box
+						ImGui::PushFont(game->font_description);
+						ImGui::BulletText("Combat:");
+						ImGui::SameLine();
+						ImGui::Text("(%d)", game->myPlayer.combat_xp);
+						ImGui::BulletText("Exploration:");
+						ImGui::SameLine();
+						ImGui::Text("(%d)", game->myPlayer.explore_xp);
+						
+						ImGui::BulletText("Trade:");
+						ImGui::SameLine();
+						ImGui::Text("(%d)", game->myPlayer.trade_xp);
+						
+						ImGui::BulletText("Mining:");
+						ImGui::SameLine();
+						ImGui::Text("(%d)", game->myPlayer.mining_xp);						
+						
+						ImGui::PopFont();
+						ImGui::EndTabItem();
+					}
+						if (ImGui::IsItemHovered())
+						{
+							ImGui::BeginTooltip();
+							ImGui::Text("View your characters experience.");
+							ImGui::EndTooltip();
+						}
+					ImGui::EndTabBar();
+				} else {
+				}
+				
 				ImGui::End();
 			}
 		}
@@ -290,11 +327,17 @@ namespace RTSEngine {
 			int winW, winH;
 			SDL_GetWindowSizeInPixels(game->get_window(), &winW, &winH);
 			
-			ImGui::SetNextWindowPos(ImVec2(winW/2.0f - 366, winH/2-180), ImGuiCond_FirstUseEver);
-			ImGui::SetNextWindowSize(ImVec2(632, 360), ImGuiCond_FirstUseEver);
+			ImGui::SetNextWindowPos(ImVec2(5,400), ImGuiCond_FirstUseEver);
+			ImGui::SetNextWindowSize(ImVec2(1265, 315), ImGuiCond_FirstUseEver);
 			
 			// Begin the window. Note that ImGui::End() should always be called.
 			if (!ImGui::Begin("cmd.exe", &render_command_line)) {
+				if (ImGui::IsItemHovered())
+				{
+					ImGui::BeginTooltip();
+					ImGui::Text("Send commands to your ships CPU.");
+					ImGui::EndTooltip();
+				}
 				ImGui::End();
 				return;
 			}
@@ -437,10 +480,99 @@ namespace RTSEngine {
 			}
 		}
 
+		void UIManager::renderScene(Core::Game* game, SDL_Texture* grid_render_target) {
+			int winW, winH;
+			SDL_GetWindowSizeInPixels(game->get_window(), &winW, &winH);
+			
+			ImGui::SetNextWindowPos(ImVec2(225,30), ImGuiCond_FirstUseEver);
+			ImGui::SetNextWindowSize(ImVec2(325,365), ImGuiCond_FirstUseEver);
+
+			if (!ImGui::Begin("camera.exe", &render_scene)) {
+				if (ImGui::IsItemHovered())
+				{
+					ImGui::BeginTooltip();
+					ImGui::Text("View the surrounding area.");
+					ImGui::EndTooltip();
+				}
+				render_viewport = false;
+				ImGui::End();
+				return;
+			}
+			ImVec2 windowPos = ImGui::GetWindowPos();
+			ImVec2 windowSize = ImGui::GetWindowSize();
+			ImTextureID imgui_texture_id = (ImTextureID)(intptr_t)grid_render_target;
+			ImGui::Image(imgui_texture_id, ImVec2(windowSize.x - 16, windowSize.y - 43));
+			
+			viewport_x = windowPos.x+4;
+			viewport_y = windowPos.y+25;
+			viewport_w = windowSize.x-8;
+			viewport_h = windowSize.y-28;
+
+			ImGui::End();
+		}
+		void UIManager::renderSystem(Core::Game* game, SDL_Texture* render_target) {
+			int winW, winH;
+			SDL_GetWindowSizeInPixels(game->get_window(), &winW, &winH);
+			
+			ImGui::SetNextWindowPos(ImVec2(5,30), ImGuiCond_FirstUseEver);
+			ImGui::SetNextWindowSize(ImVec2(215, 185), ImGuiCond_FirstUseEver);
+
+			if (!ImGui::Begin("system_map.exe", &render_system)) {
+				render_viewport_system = false;
+				if (ImGui::IsItemHovered())
+				{
+					ImGui::BeginTooltip();
+					ImGui::Text("A map of the current system.");
+					ImGui::EndTooltip();
+				}
+				ImGui::End();
+				return;
+			}
+			ImVec2 windowPos = ImGui::GetWindowPos();
+			ImVec2 windowSize = ImGui::GetWindowSize();
+			ImTextureID imgui_texture_id = (ImTextureID)(intptr_t)render_target;
+			ImGui::Image(imgui_texture_id, ImVec2(windowSize.x - 16, windowSize.y - 43));
+			
+			viewport_x = windowPos.x+4;
+			viewport_y = windowPos.y+25;
+			viewport_w = windowSize.x-8;
+			viewport_h = windowSize.y-28;
+
+			ImGui::End();
+		}
+		void UIManager::renderMap_(Core::Game* game, SDL_Texture* render_target) {
+			int winW, winH;
+			SDL_GetWindowSizeInPixels(game->get_window(), &winW, &winH);
+			
+			ImGui::SetNextWindowPos(ImVec2(4,215), ImGuiCond_FirstUseEver);
+			ImGui::SetNextWindowSize(ImVec2(215, 180), ImGuiCond_FirstUseEver);
+
+			if (!ImGui::Begin("universe_map.exe", &render_map)) {
+				render_viewport_map = false;
+				if (ImGui::IsItemHovered())
+				{
+					ImGui::BeginTooltip();
+					ImGui::Text("A map of the universe.");
+					ImGui::EndTooltip();
+				}
+				ImGui::End();
+				return;
+			}
+			ImVec2 windowPos = ImGui::GetWindowPos();
+			ImVec2 windowSize = ImGui::GetWindowSize();
+			ImTextureID imgui_texture_id = (ImTextureID)(intptr_t)render_target;
+			ImGui::Image(imgui_texture_id, ImVec2(windowSize.x - 16, windowSize.y - 43));
+			
+			viewport_x = windowPos.x+4;
+			viewport_y = windowPos.y+25;
+			viewport_w = windowSize.x-8;
+			viewport_h = windowSize.y-28;
+
+			ImGui::End();
+		}
 		void render_ingame_system_menu(Core::Game* game) {
 		}
-		void UIManager::renderLobbyScreen(const std::map<int, Core::LobbyPlayerInfo>& players, int myId, int maxPlayers, const CommandLine& cmdLine, Core::Game* game) {
-
+		void UIManager::renderLobbyScreen(const std::map<int, Core::LobbyPlayerInfo>& players, int myId, int maxPlayers, const CommandLine& cmdLine, Core::Game* game,SDL_Texture* grid_render_target,SDL_Texture* system_render_target,SDL_Texture* map_render_target) {
 			int winW, winH;
 			SDL_GetWindowSizeInPixels(game->get_window(), &winW, &winH);
 			if (ImGui::BeginMainMenuBar())
@@ -454,10 +586,43 @@ namespace RTSEngine {
 					}
 					ImGui::EndMenu();
 				}
-				if (ImGui::BeginMenu("Commands")) {
+				if (ImGui::BeginMenu("Applications")) {
 					if (ImGui::MenuItem("cmd.exe")) {
 						render_command_line = !render_command_line;
 					}
+						if (ImGui::IsItemHovered())
+						{
+							ImGui::BeginTooltip();
+							ImGui::Text("Send commands to your ships CPU.");
+							ImGui::EndTooltip();
+						}
+					if (ImGui::MenuItem("camera.exe")) {
+						render_scene = !render_scene;
+					}
+						if (ImGui::IsItemHovered())
+						{
+							ImGui::BeginTooltip();
+							ImGui::Text("View the surrounding area.");
+							ImGui::EndTooltip();
+						}
+					if (ImGui::MenuItem("system_map.exe")) {
+						render_system = !render_system;
+					}
+						if (ImGui::IsItemHovered())
+						{
+							ImGui::BeginTooltip();
+							ImGui::Text("A map of the current system.");
+							ImGui::EndTooltip();
+						}
+					if (ImGui::MenuItem("universe_map.exe")) {
+						render_map = !render_map;
+					}
+						if (ImGui::IsItemHovered())
+						{
+							ImGui::BeginTooltip();
+							ImGui::Text("A map of the universe.");
+							ImGui::EndTooltip();
+						}
 					ImGui::EndMenu();
 				}
 				
@@ -465,9 +630,21 @@ namespace RTSEngine {
 					if (ImGui::MenuItem("character.db")) {
 						render_character_info = !render_character_info;
 					}
+						if (ImGui::IsItemHovered())
+						{
+							ImGui::BeginTooltip();
+							ImGui::Text("View your characters information.");
+							ImGui::EndTooltip();
+						}
 					if (ImGui::MenuItem("systems.db")) {
 						render_system_list = !render_system_list;
 					}
+						if (ImGui::IsItemHovered())
+						{
+							ImGui::BeginTooltip();
+							ImGui::Text("View detailed system information.");
+							ImGui::EndTooltip();
+						}
 					ImGui::EndMenu();
 				}
 				ImGui::EndMainMenuBar();
@@ -528,6 +705,24 @@ namespace RTSEngine {
 			}
 			if (render_system_list) {
 				renderMap(game);
+			}
+			if (render_scene) {
+				render_viewport = true;
+				renderScene(game, grid_render_target);
+			} else {
+				render_viewport = false;
+			}
+			if (render_system) {
+				render_viewport_system = true;
+				renderSystem(game, system_render_target);
+			} else {
+				render_viewport_system = false;
+			}
+			if (render_map) {
+				render_viewport_map = true;
+				renderMap_(game, map_render_target);
+			} else {
+				render_viewport_map = false;
 			}
 		}
 

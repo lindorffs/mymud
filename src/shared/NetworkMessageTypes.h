@@ -20,6 +20,7 @@ namespace RTSEngine {
 			S2C_PLAYER_INFO = 9,
 			S2C_MAP_DATA = 10,
 			S2C_SYSTEM_DATA = 11,
+			S2C_SITE_DATA = 12,
             // Client to Server
             C2S_LOGIN_REQUEST = 100, // Example initial join message
             C2S_CLIENT_COMMAND = 101,

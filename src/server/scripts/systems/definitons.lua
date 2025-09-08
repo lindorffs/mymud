@@ -12,6 +12,8 @@ Systems = {
 				},
 				connections = {},
 				location = { x = 4, y = 7 },
+				objects = {},
+				entities = {  },
 			},
 			Jumpgate_Delta_Pyre = {
 				siteName = "Jumpgate - Delta Pyre",
@@ -19,6 +21,13 @@ Systems = {
 				rewards = {},
 				connections = { {target_system="Delta_Pyre", target_proximity="Jumpgate_Cygnus_Prime", distance = 12} },
 				location = { x = 8, y = 3 },
+				objects = {
+					Jumpgate = {
+						name = "Jumpgate to Cygnus Prime",
+						location = { x = -25, y = 0 },
+					}
+				},
+				entities = {  },
 			}
 		},
 		location = { x = 6, y = 6 },
@@ -36,6 +45,8 @@ Systems = {
 				},
 				connections = {},
 				location = { x = 1, y = 1},
+				objects = {},
+				entities = {},
 			},
 			Jumpgate_Cygnus_Prime = {
 				siteName = "Jumpgate - Cygnus Prime",
@@ -43,6 +54,13 @@ Systems = {
 				rewards = {},
 				connections = { {target_system="Cygnus_Prime", target_proximity="Jumpgate_Delta_Pyre", distance = 12} },
 				location = { x = 5, y = 8},
+				objects = {
+					Jumpgate = {
+						name = "Jumpgate to Cygnus Prime",
+						location = { x = -25, y = 0 },
+					}
+				},
+				entities = {  },
 			},
 			Jumpgate_Andromeda_Nexus = {
 				siteName = "Jumpgate - Andromeda Nexus",
@@ -50,6 +68,13 @@ Systems = {
 				rewards = {},
 				connections = { {target_system="Andromeda_Nexus", target_proximity="Jumpgate_Delta_Pyre", distance = 12} },
 				location = { x = 65, y = 72},
+				objects = {
+					Jumpgate = {
+						name = "Jumpgate to Andromeda Nexus",
+						location = { x = -25, y = 0 },
+					}
+				},
+				entities = {  },
 			},
 		},
 		location = { x = -16, y = -16 },
@@ -67,6 +92,8 @@ Systems = {
 				},
 				connections = {},
 				location = { x = 30, y = 20 },
+				objects = {},
+				entities = {},
 			},
 			Ancient_Observatory = {
 				siteName = "Ancient Observatory",
@@ -76,6 +103,8 @@ Systems = {
 				},
 				connections = {},
 				location = { x = -70, y = 90 },
+				objects = {},
+				entities = {},
 			},
 			Jumpgate_Epsilon_Draconis = {
 				siteName = "Jumpgate - Epsilon Draconis",
@@ -83,7 +112,18 @@ Systems = {
 				rewards = {},
 				connections = { {target_system="Epsilon_Draconis", target_proximity="Jumpgate_Andromeda_Nexus", distance = 15} },
 				location = { x = 10, y = -15 },
+				objects = {},
+				entities = {},
 			},
+			Jumpgate_Delta_Pyre = {
+				siteName = "Jumpgate - Delta Pyre",
+				description = "",
+				rewards = {},
+				connections = { {target_system="Delta_Pyre", target_proximity="Jumpgate_Cygnus_Prime", distance = 12} },
+				location = { x = 8, y = 3 },
+				objects = {},
+				entities = {},
+			}
 		},
 		location = { x = 10, y = 15 },
 	},
@@ -100,6 +140,8 @@ Systems = {
 				},
 				connections = {},
 				location = { x = 60, y = -10 },
+				objects = {},
+				entities = {},
 			},
 			Refugee_Outpost = {
 				siteName = "Refugee Outpost",
@@ -109,6 +151,8 @@ Systems = {
 				},
 				connections = {},
 				location = { x = 20, y = 40 },
+				objects = {},
+				entities = {},
 			},
 			Jumpgate_Andromeda_Nexus = {
 				siteName = "Jumpgate - Andromeda Nexus",
@@ -116,6 +160,8 @@ Systems = {
 				rewards = {},
 				connections = { {target_system="Andromeda_Nexus", target_proximity="Jumpgate_Epsilon_Draconis", distance = 15} },
 				location = { x = -90, y = 70 },
+				objects = {},
+				entities = {},
 			},
 		},
 		location = { x = 20, y = 5 },
@@ -133,6 +179,8 @@ Systems = {
 				},
 				connections = {},
 				location = { x = 55, y = -50 },
+				objects = {},
+				entities = {},
 			},
 			Pirate_Den = {
 				siteName = "Pirate Den",
@@ -143,6 +191,8 @@ Systems = {
 				},
 				connections = {},
 				location = { x = -84, y = 20 },
+				objects = {},
+				entities = {},
 			},
 			Jumpgate_Vega_Prime = {
 				siteName = "Jumpgate - Vega Prime",
@@ -150,6 +200,8 @@ Systems = {
 				rewards = {},
 				connections = { {target_system="Vega_Prime", target_proximity="Jumpgate_Orion_Nebula", distance = 18} },
 				location = { x = 30, y = 80 },
+				objects = {},
+				entities = {},
 			},
 		},
 		location = { x = -10, y = 20 },
@@ -167,6 +219,8 @@ Systems = {
 				},
 				connections = {},
 				location = { x = 10, y = 80 },
+				objects = {},
+				entities = {},
 			},
 			Luxury_Resort = {
 				siteName = "Luxury Resort",
@@ -176,6 +230,8 @@ Systems = {
 				},
 				connections = {},
 				location = { x = -44, y = 31 },
+				objects = {},
+				entities = {},
 			},
 			Jumpgate_Orion_Nebula = {
 				siteName = "Jumpgate - Orion Nebula",
@@ -183,6 +239,8 @@ Systems = {
 				rewards = {},
 				connections = { {target_system="Orion_Nebula", target_proximity="Jumpgate_Vega_Prime", distance = 18} },
 				location = { x = 70, y = -60 },
+				objects = {},
+				entities = {},
 			},
 		},
 		location = { x = -25, y = 10 },
@@ -200,6 +258,8 @@ Systems = {
 				},
 				connections = {},
 				location = { x = 25, y = -63 },
+				objects = {},
+				entities = {},
 			},
 			Ancient_Alien_Ruin = {
 				siteName = "Ancient Alien Ruin",
@@ -209,6 +269,8 @@ Systems = {
 				},
 				connections = {},
 				location = { x = 90, y = 40 },
+				objects = {},
+				entities = {},
 			},
 		},
 		location = { x = 30, y = 25 },

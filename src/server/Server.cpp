@@ -329,6 +329,7 @@ namespace RTSEngine {
 				else if (type_str_from_lua == "CHAT_BROADCAST") msg_type_id = Network::NetworkMsgType::S2C_CHAT_BROADCAST;
 				else if (type_str_from_lua == "MAP_DATA") msg_type_id = Network::NetworkMsgType::S2C_MAP_DATA;
 				else if (type_str_from_lua == "SYSTEM_DATA") msg_type_id = Network::NetworkMsgType::S2C_SYSTEM_DATA;
+				else if (type_str_from_lua == "SITE_DATA") msg_type_id = Network::NetworkMsgType::S2C_SITE_DATA;
 				else {
 					std::cerr << "Server (sendMessageToPlayer_Lua): Unknown message type string from Lua: " << type_str_from_lua << std::endl;
 					return;
@@ -385,7 +386,37 @@ namespace RTSEngine {
 					sol::optional<unsigned int> p_xp_archaeology_opt = data_lua_table["archaeology_xp"];
 					sol::optional<unsigned int> p_xp_trade_illegal_opt = data_lua_table["trade_illegal_xp"];
 					sol::optional<sol::table> p_on_grid_location_opt = data_lua_table["on_grid_location"];
+					sol::optional<sol::table> p_site_location_opt = data_lua_table["site_location"];
+					//sol::optional<sol::table> p_on_grid_location_opt = data_lua_table["system_location"];
+					sol::optional<sol::table> site_table_opt = data_lua_table["site"];
+					sol::table site_table = *site_table_opt;
 					
+					sol::optional<sol::table> objects_table_opt = site_table["entities"];
+					if (objects_table_opt) {
+						sol::table objects_table = *objects_table_opt;
+
+						// Iterate through the array of site objects
+						for (const auto& object_kvp : objects_table) {
+							if (object_kvp.second.is<sol::table>()) {
+								sol::table site_object = object_kvp.second.as<sol::table>();
+
+								// Create a new C++ Site object to populate
+								Network::SiteEntityData entity_data;
+
+								// Safely get the description string
+								entity_data.id = site_object["id"];
+								sol::optional<sol::table> location_table_opt = site_object["location"];
+								sol::table on_grid_location = *location_table_opt;
+								entity_data.x = on_grid_location["x"];
+								entity_data.y = on_grid_location["y"];
+
+								// Add the fully parsed Site object to the system's vector of sites
+								msg_data.site_entities.push_back(entity_data);
+							} else {
+								std::cerr << "S2C_MAP_DATA Error: Malformed site data." << std::endl; 	
+							}
+						}
+					}
 					if (p_on_grid_location_opt) {
 						sol::table on_grid_location = *p_on_grid_location_opt;
 						int x = on_grid_location["x"];
@@ -395,6 +426,16 @@ namespace RTSEngine {
 					} else {
 						msg_data.grid_x = 0;
 						msg_data.grid_y = 0;
+					}
+					if (p_site_location_opt) {
+						sol::table site_location = *p_site_location_opt;
+						int x = site_location["x"];
+						int y = site_location["y"];
+						msg_data.site_x = x;
+						msg_data.site_y = y;
+					} else {
+						msg_data.site_x = 0;
+						msg_data.site_y = 0;
 					}
 					
 					msg_data.you = *p_you_opt;
@@ -491,6 +532,10 @@ namespace RTSEngine {
 					
 					sol::optional<sol::table> system_object_table_opt = data_lua_table["system"];
 					sol::table system_object_table = *system_object_table_opt;
+					sol::optional<sol::table> system_location_table_opt = system_object_table["location"];
+					sol::table system_on_grid_location = *system_location_table_opt;
+					msg_data.x = system_on_grid_location["x"];
+					msg_data.y = system_on_grid_location["y"];
 					sol::optional<sol::table> sites_table_opt = system_object_table["Sites"];
 					if (sites_table_opt) {
 						sol::table sites_table = *sites_table_opt;
@@ -520,6 +565,46 @@ namespace RTSEngine {
 						}
 						
 					}
+					oa << msg_data;
+					serialization_ok = true;
+				} else if (msg_type_id == Network::NetworkMsgType::S2C_SITE_DATA) {
+					Network::SiteDataPayload msg_data;
+					sol::optional<sol::table> site_table_opt = data_lua_table["site"];
+					sol::table site_table = *site_table_opt;
+					sol::optional<sol::table> location_table_opt = site_table["location"];
+					sol::table location_table = *location_table_opt;
+					msg_data.x = location_table["x"];
+					msg_data.y = location_table["y"];
+					
+					sol::optional<sol::table> objects_table_opt = site_table["objects"];
+					int count = 0;
+					if (objects_table_opt) {
+						sol::table objects_table = *objects_table_opt;
+
+						// Iterate through the array of site objects
+						for (const auto& object_kvp : objects_table) {
+							if (object_kvp.second.is<sol::table>()) {
+								sol::table site_object = object_kvp.second.as<sol::table>();
+
+								// Create a new C++ Site object to populate
+								Network::SiteObjectData object_data;
+
+								// Safely get the description string
+								object_data.name = site_object["name"].get_or<std::string>("Anomally");
+								sol::optional<sol::table> location_table_opt = site_object["location"];
+								sol::table on_grid_location = *location_table_opt;
+								object_data.x = on_grid_location["x"];
+								object_data.y = on_grid_location["y"];
+
+								// Add the fully parsed Site object to the system's vector of sites
+								msg_data.objects.push_back(object_data);
+							} else {
+								std::cerr << "S2C_MAP_DATA Error: Malformed site data." << std::endl; 	
+							}
+							count = count + 1;
+						}
+					}
+					std::cout << "Sending " << count << " objects." << std::endl;
 					oa << msg_data;
 					serialization_ok = true;
 				} else {
@@ -726,15 +811,9 @@ namespace RTSEngine {
 										   "XP_COMBAT,"\
 										   "XP_EXPLORE,"\
 										   "XP_TRADE,"\
-										   "XP_MINING,"\
-										   "XP_DIPLOMACY,"\
-										   "XP_PROCESSING,"\
-										   "XP_RESEARCH,"\
-										   "XP_INFLUENCE,"\
-										   "XP_ARCHAEOLOGY,"\
-										   "XP_TRADE_ILLEGAL"\
+										   "XP_MINING"\
 										   ")"\
-										   "VALUES (?, ?, True, 'Cygnus_Prime', 'State_Military_Academy', 0, 100, 0, 0, 0, 0, 0, 0, 0, 0);";
+										   "VALUES (?, ?, True, 'Cygnus_Prime', 'State_Military_Academy', 0, 100, 0, 0);";
 										sqlite3_prepare_v2(database_, sql_insert_new_char, -1, &new_char_stmt, NULL);
 										sqlite3_bind_int(new_char_stmt, 1, new_user_id);
 										sqlite3_bind_text(new_char_stmt, 2, username.c_str(), -1, SQLITE_TRANSIENT);
@@ -767,18 +846,9 @@ namespace RTSEngine {
 									unsigned int xp_explore;
 									unsigned int xp_trade;
 									unsigned int xp_mining;
-									unsigned int xp_diplomacy;
-									unsigned int xp_processing;
-									unsigned int xp_research;
-									unsigned int xp_influence;
-									unsigned int xp_archaeology;
-									unsigned int xp_trade_illegal;
 									sqlite3_stmt *character_stmt;
 
-									std::string query = "SELECT ID, NAME, SYSTEM, PROXIMITY, XP_COMBAT, XP_EXPLORE "\
-									" XP_TRADE,"\
-									" XP_MINING"\
-									" FROM characters WHERE user_id = ? LIMIT 1;";
+									std::string query = "SELECT ID, NAME, SYSTEM, PROXIMITY, XP_COMBAT, XP_EXPLORE, XP_TRADE, XP_MINING FROM characters WHERE user_id = ? LIMIT 1;";
 									
 									sqlite3_prepare_v2(database_, query.c_str(), -1, &character_stmt, NULL);
 									sol::protected_function lua_on_connect = lua_state_["OnPlayerAccepted"];
@@ -789,6 +859,7 @@ namespace RTSEngine {
 									
 									while (rc != SQLITE_DONE) {
 										if (rc == SQLITE_ROW) {
+											character_id = sqlite3_column_int(character_stmt, 0);
 											name_from_db = sqlite3_column_text(character_stmt, 1);
 											character_name = reinterpret_cast<const char*>(name_from_db);
 											system_from_db = sqlite3_column_text(character_stmt, 2);
@@ -799,12 +870,11 @@ namespace RTSEngine {
 											xp_explore = sqlite3_column_int(character_stmt, 5);
 											xp_trade = sqlite3_column_int(character_stmt, 6);
 											xp_mining = sqlite3_column_int(character_stmt, 7);
-											character_id = sqlite3_column_int(character_stmt, 0);
 										}
 										rc = sqlite3_step(character_stmt);
 									}
 									sqlite3_finalize(character_stmt);
-									std::cout << "Found character! " << character_name << ":"<<character_id<<", " << system_string << ", " << proximity_string << std::endl;
+									std::cout << "Found character! " << character_name << ":"<<character_id<<", " << system_string << ", " << proximity_string << " " << xp_trade << " " << xp_mining << std::endl;
 									if (lua_on_connect.valid()) {
 										sol::protected_function_result result = lua_on_connect(playerId, user_id, character_id, character_name, system_string, proximity_string,
 										xp_combat, xp_explore, xp_trade, xp_mining);
@@ -1063,13 +1133,7 @@ namespace RTSEngine {
 				   "XP_COMBAT		INT		NOT NULL,"\
 				   "XP_EXPLORE		INT		NOT NULL,"\
 				   "XP_TRADE		INT		NOT NULL,"\
-				   "XP_MINING		INT		NOT NULL,"\
-				   "XP_DIPLOMACY	INT		NOT NULL,"\
-				   "XP_PROCESSING	INT		NOT NULL,"\
-				   "XP_RESEARCH		INT		NOT NULL,"\
-				   "XP_INFLUENCE	INT		NOT NULL,"\
-				   "XP_ARCHAEOLOGY	INT		NOT NULL,"\
-				   "XP_TRADE_ILLEGAL INT	NOT NULL"\
+				   "XP_MINING		INT		NOT NULL"\
 				   ");";
 				
 				if (sqlite3_exec(database_, sql_characters_create, callback, 0, &zErrMsg) != SQLITE_OK) {

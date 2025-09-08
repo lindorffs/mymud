@@ -2,7 +2,6 @@
 #define RTSENGINE_GAME_H
 
 #include <SDL3/SDL.h>
-
 #include <string>
 #include <vector>
 #include <list>
@@ -24,6 +23,9 @@
 #include "AudioManager.h"
 #include "../UI/CommandLine.h"
 #include "../UI/UIManager.h"
+
+#include "../../shared/NetworkMessageTypes.h" // Our enum
+#include "../../shared/NetworkMessages.h"   // Our message structs
 
 
 namespace asio = boost::asio;
@@ -95,13 +97,28 @@ namespace RTSEngine {
 			std::vector<ProceduralObject> m_galaxies;
 			std::vector<ProceduralObject> m_dustClouds;
 		};
+				
+		struct grid_coordinates {
+			int x;
+			int y;
+		};
 		
 		struct PlayerInfo {
 			std::string name;
 			std::string system;
 			std::string proximity;
-			unsigned int combat_xp;
-			unsigned int explore_xp;
+			unsigned int combat_xp=0;
+			unsigned int explore_xp=0;
+			unsigned int mining_xp=0;
+			unsigned int processing_xp=0;
+			unsigned int research_xp=0;
+			unsigned int archaeology_xp=0;
+			unsigned int influence_xp=0;
+			unsigned int diplomacy_xp=0;
+			unsigned int trade_xp=0;
+			unsigned int illegal_trade_xp=0;
+			grid_coordinates grid_location;
+			grid_coordinates site_location;
 		};
 		
         // Game class remains the central piece
@@ -187,7 +204,13 @@ namespace RTSEngine {
 			std::string password_;
 			asio::ssl::context ssl_context_;
         public:
+			SDL_Texture* grid_render_target;
+			SDL_Texture* system_render_target;
+			SDL_Texture* map_render_target;
 			std::vector<SystemInformation> systems;
+			std::vector<struct Network::SiteEntityData> site_entities;
+			Network::SystemDataPayload current_system;
+			Network::SiteDataPayload current_site;
 			PlayerInfo myPlayer;
 			ImFont *font_title;
 			ImFont *font_subtitle;

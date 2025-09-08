@@ -63,16 +63,27 @@ namespace RTSEngine {
 			
 
         public:
+			bool render_viewport = false;
+			bool render_viewport_system = false;
+			bool render_viewport_map = false;
+			int viewport_x = 100;
+			int viewport_y = 100;
+			int viewport_w = 100;
+			int viewport_h = 100;
+		
             UIManager(SDL_Renderer* renderer, SDL_Window* window, Core::AssetManager& assetManager);
 
 			void renderMainMenu(const std::vector<std::string>& options, int selectedOption, Core::Game* game);
 			void renderConnectingScreen(const std::string& statusMessage);
-			void renderLobbyScreen(const std::map<int, Core::LobbyPlayerInfo>& players, int myId, int maxPlayers, const CommandLine& cmdLine, Core::Game* game);
+			void renderLobbyScreen(const std::map<int, Core::LobbyPlayerInfo>& players, int myId, int maxPlayers, const CommandLine& cmdLine, Core::Game* game, SDL_Texture* grid_render_target, SDL_Texture* system_render_target, SDL_Texture* map_render_target);
 			void renderLoadingScreen(const std::string& message);
 			void renderDisconnectedScreen(const std::string& message, Core::Game* game);
 			void renderCharacterInfo(Core::Game *game);
 			void renderText(const std::string& text, float x, float y, TTF_Font* font, SDL_Color color);
 			void renderMap(Core::Game* game);
+			void renderScene(Core::Game* game, SDL_Texture* render_target);
+			void renderSystem(Core::Game* game, SDL_Texture* render_target);
+			void renderMap_(Core::Game* game, SDL_Texture* render_target);
             void renderAll(const CommandLine& cmdLine,
 						   Core::Game* game);
         };
