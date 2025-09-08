@@ -39,6 +39,12 @@ function OnPlayerDisconnected(playerId)
     local disconnectedPlayerName = "Player" .. playerId
     for i, p in ipairs(Server.players) do
         if p.id == playerId then
+			local current_site = Systems[p.currentSystem].Sites[p.proximity]
+			for _, e in ipairs(current_site.entities) do
+				if (e.id == playerId) then
+					table.remove(Systems[p.currentSystem].Sites[p.proximity].entities, _)
+				end
+			end
             playerIndex = i
             disconnectedPlayerName = p.name
 			GameAPI.writeCharacterData(p.characterId, p.currentSystem, p.proximity, p.xp.combat, p.xp.explore,
@@ -46,7 +52,8 @@ function OnPlayerDisconnected(playerId)
             break
         end
     end
-
+	
+	table.insert(Systems[system_key].Sites[site_key].entities, {id = playerId, location = {x = 0, y = 0}})
     if playerIndex > 0 then
         table.remove(Server.players, playerIndex)
         
