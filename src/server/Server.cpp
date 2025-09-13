@@ -129,7 +129,7 @@ namespace RTSEngine {
 				game_api.set_function("sendMessageToPlayer", [this](int pid, const std::string& type, const sol::table& data){ this->sendMessageToPlayer_Lua(pid, type, data); });
 				game_api.set_function("setPlayerName", [this](int pid, const std::string& name){ this->setPlayerName_Lua(pid, name); });
 				game_api.set_function("sendPlayerCommandAck", [this](int playerId, const std::string& original_command, bool success, const std::string& status_msg){ this->sendCommandAckToPlayer_Lua(playerId, original_command, success, status_msg); });
-				game_api.set_function("writeCharacterData", [this](int id, const std::string& system, const std::string& proximity, unsigned int combat_xp, unsigned int explore_xp, unsigned int trade_xp, unsigned int mining_xp) { this->writeCharacterData_Lua(id, system, proximity, combat_xp, explore_xp, trade_xp, mining_xp); });
+				game_api.set_function("writeCharacterData", [this](int id, const std::string& system, const std::string& proximity, int grid_x, int grid_y, unsigned int combat_xp, unsigned int explore_xp, unsigned int trade_xp, unsigned int mining_xp) { this->writeCharacterData_Lua(id, system, proximity, grid_x, grid_y, combat_xp, explore_xp, trade_xp, mining_xp); });
 
                 lua_state_.script_file("./scripts/main_logic.lua");
 
@@ -143,9 +143,9 @@ namespace RTSEngine {
             }
         }
 	
-        void Server::writeCharacterData_Lua(int id, const std::string& system, const std::string& proximity, unsigned int combat_xp, unsigned int explore_xp, unsigned int trade_xp, unsigned int mining_xp) {
+        void Server::writeCharacterData_Lua(int id, const std::string& system, const std::string& proximity, int grid_x, int grid_y, unsigned int combat_xp, unsigned int explore_xp, unsigned int trade_xp, unsigned int mining_xp) {
 			char *sql_update = "update CHARACTERS set " \
-				" SYSTEM = ?,PROXIMITY = ?,XP_COMBAT = ?,XP_EXPLORE = ?" \
+				" SYSTEM = ?,PROXIMITY = ?, GRID_X=?, GRID_Y=?, XP_COMBAT = ?,XP_EXPLORE = ?" \
 				",XP_TRADE=? ,XP_MINING = ?"\
 				" where ID = ?;";
 			
@@ -156,11 +156,13 @@ namespace RTSEngine {
 			
 			sqlite3_bind_text(update_stmt, 1, system.c_str(), -1, SQLITE_TRANSIENT);
 			sqlite3_bind_text(update_stmt, 2, proximity.c_str(), -1, SQLITE_TRANSIENT);
-			sqlite3_bind_int(update_stmt, 3, combat_xp);
-			sqlite3_bind_int(update_stmt, 4, explore_xp);
-			sqlite3_bind_int(update_stmt, 5, trade_xp);
-			sqlite3_bind_int(update_stmt, 6, mining_xp);
-			sqlite3_bind_int(update_stmt, 7, id);
+			sqlite3_bind_int(update_stmt, 3, grid_x);
+			sqlite3_bind_int(update_stmt, 4, grid_y);
+			sqlite3_bind_int(update_stmt, 5, combat_xp);
+			sqlite3_bind_int(update_stmt, 6, explore_xp);
+			sqlite3_bind_int(update_stmt, 7, trade_xp);
+			sqlite3_bind_int(update_stmt, 8, mining_xp);
+			sqlite3_bind_int(update_stmt, 9, id);
 			
 			int rc = sqlite3_step(update_stmt);
 			
@@ -783,7 +785,7 @@ namespace RTSEngine {
 
 								rc = sqlite3_step(new_user_stmt);
 								if (rc != SQLITE_DONE && rc != SQLITE_ROW) {
-									std::cout << "Failed to create new user: " << username.c_str() << std::endl;
+									std::cerr << "Failed to create new user: " << username.c_str() << std::endl;
 									fprintf(stderr, "Error during sqlite3_step(): Code %d - %s\n", sqlite3_errcode(database_), sqlite3_errmsg(database_));
 									sqlite3_finalize(new_user_stmt);
 									authorized = false;
@@ -795,7 +797,7 @@ namespace RTSEngine {
 									sqlite3_bind_text(new_user_id_statement, 1, username.c_str(), -1, SQLITE_TRANSIENT);
 									rc = sqlite3_step(new_user_id_statement);
 									if (rc != SQLITE_DONE && rc != SQLITE_ROW) {
-										std::cout << "Failed to get new user id for: " << username.c_str() << std::endl;
+										std::cerr << "Failed to get new user id for: " << username.c_str() << std::endl;
 										fprintf(stderr, "Error during sqlite3_step(): Code %d - %s\n", sqlite3_errcode(database_), sqlite3_errmsg(database_));
 										sqlite3_finalize(new_user_id_statement);
 										authorized = false;
@@ -808,23 +810,25 @@ namespace RTSEngine {
 										   "NEW,"\
 										   "SYSTEM,"\
 										   "PROXIMITY,"\
+										   "GRID_X,"\
+										   "GRID_Y,"\
 										   "XP_COMBAT,"\
 										   "XP_EXPLORE,"\
 										   "XP_TRADE,"\
 										   "XP_MINING"\
 										   ")"\
-										   "VALUES (?, ?, True, 'Cygnus_Prime', 'State_Military_Academy', 0, 100, 0, 0);";
+										   "VALUES (?, ?, True, 'Cygnus_Prime', 'Alterra', 0, 0, 0, 0, 0, 0);";
 										sqlite3_prepare_v2(database_, sql_insert_new_char, -1, &new_char_stmt, NULL);
 										sqlite3_bind_int(new_char_stmt, 1, new_user_id);
 										sqlite3_bind_text(new_char_stmt, 2, username.c_str(), -1, SQLITE_TRANSIENT);
 										rc = sqlite3_step(new_char_stmt);
 										if (rc != SQLITE_DONE && rc != SQLITE_ROW) {
-											std::cout << "Failed to create new character for: " << username.c_str() << std::endl;
+											std::cerr << "Failed to create new character for: " << username.c_str() << std::endl;
 											fprintf(stderr, "Error during sqlite3_step(): Code %d - %s\n", sqlite3_errcode(database_), sqlite3_errmsg(database_));
 											sqlite3_finalize(new_char_stmt);
 											authorized = false;
 										} else {
-											std::cout << "Created new character for: " << username.c_str() << std::endl;
+											//std::cout << "Created new character for: " << username.c_str() << std::endl;
 											sqlite3_finalize(new_char_stmt);
 											authorized = true;
 											user_id = new_user_id;
@@ -846,9 +850,11 @@ namespace RTSEngine {
 									unsigned int xp_explore;
 									unsigned int xp_trade;
 									unsigned int xp_mining;
+									int grid_x;
+									int grid_y;
 									sqlite3_stmt *character_stmt;
 
-									std::string query = "SELECT ID, NAME, SYSTEM, PROXIMITY, XP_COMBAT, XP_EXPLORE, XP_TRADE, XP_MINING FROM characters WHERE user_id = ? LIMIT 1;";
+									std::string query = "SELECT ID, NAME, SYSTEM, PROXIMITY, GRID_X, GRID_Y, XP_COMBAT, XP_EXPLORE, XP_TRADE, XP_MINING FROM characters WHERE user_id = ? LIMIT 1;";
 									
 									sqlite3_prepare_v2(database_, query.c_str(), -1, &character_stmt, NULL);
 									sol::protected_function lua_on_connect = lua_state_["OnPlayerAccepted"];
@@ -866,17 +872,19 @@ namespace RTSEngine {
 											system_string = reinterpret_cast<const char*>(system_from_db);
 											proximity_from_db = sqlite3_column_text(character_stmt, 3);
 											proximity_string = reinterpret_cast<const char*>(proximity_from_db);
-											xp_combat = sqlite3_column_int(character_stmt, 4);
-											xp_explore = sqlite3_column_int(character_stmt, 5);
-											xp_trade = sqlite3_column_int(character_stmt, 6);
-											xp_mining = sqlite3_column_int(character_stmt, 7);
+											grid_x = sqlite3_column_int(character_stmt, 4);
+											grid_y = sqlite3_column_int(character_stmt, 5);
+											xp_combat = sqlite3_column_int(character_stmt, 6);
+											xp_explore = sqlite3_column_int(character_stmt, 7);
+											xp_trade = sqlite3_column_int(character_stmt, 8);
+											xp_mining = sqlite3_column_int(character_stmt, 9);
 										}
 										rc = sqlite3_step(character_stmt);
 									}
 									sqlite3_finalize(character_stmt);
-									std::cout << "Found character! " << character_name << ":"<<character_id<<", " << system_string << ", " << proximity_string << " " << xp_trade << " " << xp_mining << std::endl;
+									//std::cout << "Found character! " << character_name << ":"<<character_id<<", " << system_string << ", " << proximity_string <<", " << " " << xp_trade << " " << xp_mining << std::endl;
 									if (lua_on_connect.valid()) {
-										sol::protected_function_result result = lua_on_connect(playerId, user_id, character_id, character_name, system_string, proximity_string,
+										sol::protected_function_result result = lua_on_connect(playerId, user_id, character_id, character_name, system_string, proximity_string, grid_x, grid_y,
 										xp_combat, xp_explore, xp_trade, xp_mining);
 										if (!result.valid()) {
 											sol::error err = result;
@@ -1130,6 +1138,8 @@ namespace RTSEngine {
 				   "NEW				BOOL	NOT NULL,"\
 				   "SYSTEM			TEXT	NOT NULL,"\
 				   "PROXIMITY		TEXT	NOT NULL,"\
+				   "GRID_X			INT		NOT NULL,"\
+				   "GRID_Y			INT		NOT NULL,"\
 				   "XP_COMBAT		INT		NOT NULL,"\
 				   "XP_EXPLORE		INT		NOT NULL,"\
 				   "XP_TRADE		INT		NOT NULL,"\

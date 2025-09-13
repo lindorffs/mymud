@@ -1,4 +1,4 @@
-function _player(playerId, userId, characterId, name, system, proximity, combat_xp, explore_xp, trade_xp, mining_xp)
+function _player(playerId, userId, characterId, name, system, proximity, grid_x, grid_y, combat_xp, explore_xp, trade_xp, mining_xp)
     local newPlayer = {
         id = playerId,
         userId = userId,
@@ -7,9 +7,9 @@ function _player(playerId, userId, characterId, name, system, proximity, combat_
         joinTime = os.time(),
         currentSystem = system,
         proximity = proximity,
+        on_grid_location = {x = grid_x, y = grid_y},
         target_proximity = "",
         target_system = "",
-        on_grid_location = {x = 0, y = 0},
         on_grid_target = nil,
         moving_on_grid = false,
         warping = false,

@@ -1,11 +1,11 @@
-function OnPlayerAccepted(playerId, userId, characterId, name, system, proximity, combat_xp, explore_xp, trade_xp, mining_xp)
+function OnPlayerAccepted(playerId, userId, characterId, name, system, proximity, grid_x, grid_y, combat_xp, explore_xp, trade_xp, mining_xp)
     print("Lua: OnPlayerAccepted - Player ID: " .. playerId .. ", User ID: " .. userId .. ", Name: ".. name .. " TradeXP: " .. trade_xp .. " MiningXP: " .. mining_xp)
 
-    local newPlayer = _player(playerId, userId, characterId, name, system, proximity, combat_xp, explore_xp, trade_xp, mining_xp)
+    local newPlayer = _player(playerId, userId, characterId, name, system, proximity, grid_x, grid_y, combat_xp, explore_xp, trade_xp, mining_xp)
     table.insert(Server.players, newPlayer)
 	table.insert(Systems[system].players, newPlayer.id)
     print("Lua: Player " .. playerId .. " (" .. newPlayer.name .. ") added to Server. Total: " .. #Server.players)
-	movePlayer(playerId, system, proximity)
+	movePlayer(playerId, system, proximity,true)
 	local system_ = getSystemData(system)
 	local site = getSiteData(system, proximity)
 	GameAPI.sendMessageToPlayer(playerId, "PLAYER_INFO", {
@@ -47,13 +47,13 @@ function OnPlayerDisconnected(playerId)
 			end
             playerIndex = i
             disconnectedPlayerName = p.name
-			GameAPI.writeCharacterData(p.characterId, p.currentSystem, p.proximity, p.xp.combat, p.xp.explore,
+			GameAPI.writeCharacterData(p.characterId, p.currentSystem, p.proximity, p.on_grid_location.x, p.on_grid_location.y, p.xp.combat, p.xp.explore,
 			p.xp.trade, p.xp.mining)
             break
         end
     end
 	
-	table.insert(Systems[system_key].Sites[site_key].entities, {id = playerId, location = {x = 0, y = 0}})
+	--table.insert(Systems[system_key].Sites[site_key].entities, {id = playerId, location = {x = 0, y = 0}})
     if playerIndex > 0 then
         table.remove(Server.players, playerIndex)
         

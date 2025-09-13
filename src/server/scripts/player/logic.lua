@@ -19,7 +19,7 @@ function GetIPSanitizedPlayersTable()
 	return sanitized
 end
 
-function movePlayer(playerId, system_key, site_key)
+function movePlayer(playerId, system_key, site_key,reset_grid)
 	local player = GetPlayerById(playerId)
 	local current_site = Systems[player.currentSystem].Sites[player.proximity]
 	
@@ -28,7 +28,11 @@ function movePlayer(playerId, system_key, site_key)
 			table.remove(Systems[player.currentSystem].Sites[player.proximity].entities, _)
 		end
 	end
-	table.insert(Systems[system_key].Sites[site_key].entities, {id = playerId, location = {x = 0, y = 0}})
+	if (not reset_grid) then
+		table.insert(Systems[system_key].Sites[site_key].entities, {id = playerId, location = {x = 0, y = 0}})
+	else
+		table.insert(Systems[system_key].Sites[site_key].entities, {id = playerId, location = player.on_grid_location})
+	end
 	if (system_key ~= player.currentSystem) then
 		for _, p in ipairs(Systems[player.currentSystem].players) do
 			if p == playerId then
@@ -49,7 +53,11 @@ function movePlayer(playerId, system_key, site_key)
 			Server.players[_].proximity = site_key
 			Server.players[_].target_proximity = ""
 			Server.players[_].target_system = ""
-			Server.players[_].on_grid_location = { x = 0, y = 0}
+			if (not reset_grid) then
+				Server.players[_].on_grid_location = { x = 0, y = 0}
+			else
+			
+			end
 		end
     end
 end
